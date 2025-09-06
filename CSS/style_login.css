@@ -1,0 +1,195 @@
+/* Variables CSS para una gestión de colores más fácil */
+:root {
+    --primary-green-dark: #2b442d; /* Verde oscuro para el panel izquierdo */
+    --primary-green-light: #282e28; /* Verde un poco más claro para el degradado */
+    --accent-green-button: #4CAF50; /* Verde para el botón */
+    --accent-green-button-hover: #45a049; /* Verde más oscuro para el hover del botón */
+    --background-light: #37cf5d; /* Fondo general de la página */
+    --panel-background: #ffffff; /* Fondo del panel derecho/caja de formulario */
+    --text-dark: #333333; /* Texto principal oscuro */
+    --text-light: #666666; /* Texto secundario/placeholder */
+    --input-background: #e0e0e0; /* Fondo de los campos de entrada */
+    --link-color: #1976d2; /* Azul para enlaces */
+    --link-hover-color: #1565c0; /* Azul más oscuro para hover de enlaces */
+     
+}
+
+#password {
+    font-size: 1.8em;
+    color: red; /* Título oscuro */
+    margin-bottom: 30px;
+    font-weight: 700;
+    letter-spacing: 0.5px; /* Pequeño espaciado entre letras */
+}
+
+body {
+    
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-image: url("/IMG/fondo.png");/* Fondo general de la página */
+    color: var(--text-dark);
+}
+
+.login-page-container {
+    display: flex;
+    width: 900px; /* Ancho total del contenedor */
+    max-width: 90%; /* Máximo el 90% del ancho de la vista */
+    height: 550px; /* Alto fijo para el contenedor */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15); /* Sombra más suave y extendida */
+    border-radius: 12px; /* Bordes más redondeados */
+    overflow: hidden; /* Asegura que el contenido interno no se desborde */
+    background-color: var(--panel-background); /* Fondo blanco para todo el módulo */
+}
+
+.left-panel {
+    flex: 1.2; /* Este panel será ligeramente más ancho */
+    background: linear-gradient(135deg, var(--primary-green-dark), var(--primary-green-light)); /* Degradado de verdes */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden; /* Para las "conexiones" */
+    
+}
+
+/* Simulación de las "conexiones" en el panel izquierdo con pseudo-elementos o cajas */
+.left-panel::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 10% 10%, rgba(255,255,255,0.05) 1px, transparent 1px),
+                radial-gradient(circle at 90% 90%, rgba(255,255,255,0.05) 1px, transparent 1px);
+    background-size: 40px 40px; /* Tamaño de la cuadrícula de puntos */
+    opacity: 0.8;
+}
+
+.right-panel {
+    flex: 2; /* Este panel será más grande para el formulario */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 30px;
+    box-sizing: border-box; /* Incluye padding en el ancho */
+}
+
+.form-box {
+    text-align: center;
+    width: 100%;
+    max-width: 350px; /* Ancho máximo del contenido del formulario */
+}
+
+.user-icon {
+    margin-bottom: 25px;
+}
+
+.user-icon img {
+    width: 90px; /* Tamaño del icono */
+    height: 90px;
+    border-radius: 50%;
+    border: 3px solid var(--text-dark); /* Borde oscuro alrededor del icono */
+    padding: 8px; /* Espacio interno del icono */
+    box-sizing: border-box;
+}
+
+h1 {
+    font-size: 1.8em;
+    color: var(--text-dark); /* Título oscuro */
+    margin-bottom: 30px;
+    font-weight: 700;
+    letter-spacing: 0.5px; /* Pequeño espaciado entre letras */
+}
+
+#GESTAC {
+  color: rgba(168, 168, 168, 0.678);         /* Cambia el color del texto */
+  font-size: 40px;    /* (opcional) tamaño de letra */
+  font-weight: bold;  /* (opcional) negrita */
+  text-align: center; /* (opcional) centrar texto */
+}
+
+label {
+    display: block;
+    text-align: left;
+    margin-bottom: 8px;
+    font-size: 0.9em;
+    color: var(--text-dark);
+    font-weight: bold;
+    text-transform: uppercase; /* Etiquetas en mayúsculas */
+    letter-spacing: 0.5px;
+}
+
+.input-field {
+    width: calc(100% - 24px); /* Ancho completo menos padding */
+    padding: 12px;
+    margin-bottom: 25px;
+    border: none; /* Sin borde */
+    border-radius: 8px; /* Más redondeado */
+    background-color: var(--input-background); /* Fondo gris claro */
+    font-size: 1em;
+    color: var(--text-dark);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1); /* Sombra interna para profundidad */
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.input-field::placeholder {
+    color: var(--text-light); /* Color del placeholder más suave */
+    font-style: italic;
+}
+
+.input-field:focus {
+    outline: none;
+    background-color: #ffffff; /* Blanco al enfocar */
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.3), inset 0 1px 3px rgba(0, 0, 0, 0.1); /* Anillo de enfoque verde */
+}
+
+.login-button {
+    width: 100%;
+    padding: 14px 20px;
+    background-color: var(--accent-green-button);
+    color: var(--button-text-color); /* Blanco para el texto del botón */
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1em;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.login-button:hover {
+    background-color: var(--accent-green-button-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.link-forgot-password, .link-back-login {
+    margin-top: 25px;
+    font-size: 0.9em;
+}
+
+.link-forgot-password a, .link-back-login a {
+    color: var(--link-color);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.link-forgot-password a:hover, .link-back-login a:hover {
+    color: var(--link-hover-color);
+    text-decoration: underline;
+}
+
+.instruction-text {
+    font-size: 0.9em;
+    color: var(--text-light);
+    margin-bottom: 25px;
+    line-height: 1.5;
+}

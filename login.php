@@ -1,36 +1,30 @@
 <?php
-$servername = "localhost";
-$db_username = "root";
-$db_password = "";
-$dbname = "gestac";
+$conn = new mysqli("localhost", "root", "", "gestac");
+header('Content-Type: application/json');
 
-// Crear conexión
-$conn = new mysqli($servername, $db_username, $db_password, $dbname);
-
-// Verificar conexión
-if ($conn->connect_error) {
-    die("❌ Error de conexión: " . $conn->connect_error);
+if($conn->connect_error){
+    echo json_encode(["success"=>false,"message"=>"Error de conexión"]);
+    exit();
 }
 
-// Recibir datos del formulario
 $user = trim($_POST['usuario'] ?? '');
 $pass = trim($_POST['password'] ?? '');
 
-// Preparar consulta para validar usuario y contraseña
-$stmt = $conn->prepare("SELECT username, rol, password FROM users WHERE username = ? AND password = ?");
-$stmt->bind_param("ss", $user, $pass);
+$stmt = $conn->prepare("SELECT username, rol, password FROM users WHERE username = ?");
+$stmt->bind_param("s", $user);
 $stmt->execute();
 $result = $stmt->get_result();
 
-if ($result->num_rows > 0) {
+if($result->num_rows > 0){
     $row = $result->fetch_assoc();
-    echo "✅ Usuario correcto: " . $row['username'] . "<br>";
-    echo "Rol: " . $row['rol'];
+    if($pass === $row['password']){ 
+        echo json_encode(["success"=>true,"rol"=>$row['rol']]);
+    } else {
+        echo json_encode(["success"=>false,"message"=>"❌ Usuario o contraseña incorrectos"]);
+    }
 } else {
-    echo "❌ Usuario o contraseña incorrectos";
+    echo json_encode(["success"=>false,"message"=>"❌ Usuario o contraseña incorrectos"]);
 }
 
-// Cerrar conexión
 $stmt->close();
 $conn->close();
-?>

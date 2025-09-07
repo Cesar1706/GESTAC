@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuperar Contraseña</title>
+    <link rel="stylesheet" href="../CSS/style_login.css">
+</head>
+<body style="background-image: url('../IMG/fondo.png'); background-repeat: no-repeat; background-size: cover; background-position: center;">
+    <div class="login-page-container">
+        <div class="left-panel">
+            <h1 id="GESTAC">GESTAC</h1>
+        </div>
+
+        <div class="right-panel">
+            <!-- === FORMULARIO LOGIN ADMIN === -->
+            <div id="login-section" class="form-box">
+                <div class="user-icon">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3237/3237472.png" alt="Icono de Usuario">
+                </div>
+                <h1>RECUPERAR CONTRASEÑA</h1>
+                <div id="error-message"></div>
+                <form id="loginForm">
+                    <label for="usuario_login">USUARIO ADMIN</label>
+                    <input type="text" id="usuario_login" name="usuario" class="input-field" placeholder="Ingresa tu usuario" required>
+
+                    <label for="password_login">CONTRASEÑA ADMIN</label>
+                    <input type="password" id="password_login" name="password" class="input-field" placeholder="Ingresa tu contraseña" required>
+
+                    <button type="submit" class="login-button">ENTRAR</button>
+                </form>
+                <p class="link-forgot-password"><a href="login.html">Iniciar sesión</a></p>
+            </div>
+
+            <!-- === FORMULARIO CAMBIO DE CONTRASEÑA === -->
+            <div id="update-section" class="form-box" style="display:none;">
+                <div class="user-icon">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3237/3237472.png" alt="Icono de Usuario">
+                </div>
+                <h1>CAMBIAR CONTRASEÑA</h1>
+                <div id="update-message"></div>
+                <form id="updateForm">
+                    <label for="usuario_update">USUARIO</label>
+                    <input type="text" id="usuario_update" name="usuario_update" class="input-field" placeholder="Usuario a actualizar" required>
+
+                    <label for="new_password">NUEVA CONTRASEÑA</label>
+                    <input type="password" id="new_password" name="new_password" class="input-field" placeholder="Nueva contraseña" required>
+
+                    <button type="submit" class="login-button">ACTUALIZAR</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+<script>
+// === LOGIN ADMIN ===
+document.getElementById("loginForm").addEventListener("submit", function(e){
+    e.preventDefault();
+
+    const usuario = document.getElementById("usuario_login").value.trim();
+    const password = document.getElementById("password_login").value.trim();
+    const errorDiv = document.getElementById("error-message");
+
+    fetch("../login.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `action=login&usuario=${encodeURIComponent(usuario)}&password=${encodeURIComponent(password)}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.success && data.rol === "admin"){
+            errorDiv.innerHTML = `<p style="color:green;">✅ Bienvenido administrador</p>`;
+            document.getElementById("login-section").style.display = "none";
+            document.getElementById("update-section").style.display = "block";
+        } else {
+            errorDiv.innerHTML = `<p class="error-message">❌ Credenciales inválidas o no eres admin</p>`;
+        }
+    })
+    .catch(err => console.error("Error:", err));
+});
+
+// === CAMBIO DE CONTRASEÑA ===
+document.getElementById("updateForm").addEventListener("submit", function(e){
+    e.preventDefault();
+
+    const usuarioUpdate = document.getElementById("usuario_update").value.trim();
+    const newPassword = document.getElementById("new_password").value.trim();
+    const updateDiv = document.getElementById("update-message");
+
+    fetch("../login.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `action=update_password&usuario=${encodeURIComponent(usuarioUpdate)}&new_password=${encodeURIComponent(newPassword)}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.success){
+            updateDiv.innerHTML = `<p style="color:green;">${data.message}</p>`;
+        } else {
+            updateDiv.innerHTML = `<p class="error-message">${data.message}</p>`;
+        }
+    })
+    .catch(err => console.error("Error:", err));
+});
+</script>
+</body>
+</html>

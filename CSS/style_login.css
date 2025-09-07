@@ -43,7 +43,6 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background-image: url("..IMG/fondo.png");/* Fondo general de la página */
     color: var(--text-dark);
 }
 

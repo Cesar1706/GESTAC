@@ -7,13 +7,14 @@
     <link rel="stylesheet" href="../CSS/style_login.css">
 </head>
 <body style="background-image: url('../IMG/fondo.png'); background-repeat: no-repeat; background-size: cover; background-position: center;">
+   
     <div class="login-page-container">
         <div class="left-panel">
             <h1 id="GESTAC">GESTAC</h1>
         </div>
 
         <div class="right-panel">
-            <!-- === FORMULARIO LOGIN ADMIN === -->
+            <!-- FORMULARIO LOGIN ADMIN -->
             <div id="login-section" class="form-box">
                 <div class="user-icon">
                     <img src="https://cdn-icons-png.flaticon.com/512/3237/3237472.png" alt="Icono de Usuario">
@@ -32,7 +33,7 @@
                 <p class="link-forgot-password"><a href="login.html">Iniciar sesión</a></p>
             </div>
 
-            <!-- === FORMULARIO CAMBIO DE CONTRASEÑA === -->
+            <!-- FORMULARIO CAMBIO DE CONTRASEÑA -->
             <div id="update-section" class="form-box" style="display:none;">
                 <div class="user-icon">
                     <img src="https://cdn-icons-png.flaticon.com/512/3237/3237472.png" alt="Icono de Usuario">
@@ -64,7 +65,7 @@ document.getElementById("loginForm").addEventListener("submit", function(e){
     fetch("../login.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `action=login&usuario=${encodeURIComponent(usuario)}&password=${encodeURIComponent(password)}`
+        body: `usuario=${encodeURIComponent(usuario)}&password=${encodeURIComponent(password)}`
     })
     .then(response => response.json())
     .then(data => {
@@ -90,12 +91,16 @@ document.getElementById("updateForm").addEventListener("submit", function(e){
     fetch("../login.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `action=update_password&usuario=${encodeURIComponent(usuarioUpdate)}&new_password=${encodeURIComponent(newPassword)}`
+        body: `action=update_password&usuario_update=${encodeURIComponent(usuarioUpdate)}&new_password=${encodeURIComponent(newPassword)}`
     })
     .then(response => response.json())
     .then(data => {
         if(data.success){
-            updateDiv.innerHTML = `<p style="color:green;">${data.message}</p>`;
+            updateDiv.innerHTML = `<p style="color:green;">${data.message} <br>Redirigiendo al login...</p>`;
+            // Redirigir después de 2 segundos
+            setTimeout(() => {
+                window.location.href = "login.html";
+            }, 2000);
         } else {
             updateDiv.innerHTML = `<p class="error-message">${data.message}</p>`;
         }

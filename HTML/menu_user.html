@@ -2,10 +2,51 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Menú Usuario</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menú Principal</title>
+    <link rel="stylesheet" href="../CSS/style_menu.css">
 </head>
-<body>
-    <h1>Bienvenido, usuario</h1>
-    <p>Has iniciado sesión correctamente como USUARIO.</p>
+<body style="background-image: url('../IMG/fondo.png'); background-repeat: no-repeat; background-size: cover; background-position: center;">
+    <div class="menu-container">
+        <div class="left-panel">
+            <h1 id="GESTAC">GESTAC</h1>
+        </div>
+        <div class="right-panel">
+            <div class="modules-grid">
+                <!-- Módulo con submenú -->
+                <div class="module-card has-submenu">
+                    <img src="../IMG/activos.png" alt="Activos" class="module-img">
+                    <span class="module-text">ACTIVOS</span>
+                    <div class="submenu">
+                        <a href="#">NUEVO ACTIVO</a>
+                        <a href="#">MODIFICAR ACTIVO</a>
+                        <a href="#">VER ACTIVO</a>
+                    </div>
+                </div>
+
+                <!-- Otros módulos -->
+                <a href="#" class="module-card">
+                    <img src="../IMG/asignar.png" alt="Asignar" class="module-img">
+                    <span class="module-text">ASIGNAR</span>
+                </a>
+                <a href="#" class="module-card">
+                    <img src="../IMG/perifericos.png" alt="Periféricos" class="module-img">
+                    <span class="module-text">INVENTARIO PERIFÉRICOS</span>
+                </a>
+                <a href="#" class="module-card">
+                    <img src="../IMG/prestamos.png" alt="Préstamos" class="module-img">
+                    <span class="module-text">ESPECIALES PRESTAMOS</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Icono de configuración -->
+    <a href="#" class="config-icon" title="Configuraciones">⚙️</a>
+
+    <!-- Leyenda de usuario -->
+    <div class="user-legend">
+        Usuario: <span id="user-type">USUARIO</span>
+    </div>
 </body>
 </html>

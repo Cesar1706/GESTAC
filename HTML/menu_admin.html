@@ -2,10 +2,246 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Menú Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menú Principal</title>
+    <link rel="stylesheet" href="../CSS/style_menu.css">
 </head>
-<body>
-    <h1>Bienvenido, administrador</h1>
-    <p>Has iniciado sesión correctamente como ADMIN.</p>
+<body style="background-image: url('../IMG/fondo.png'); background-repeat: no-repeat; background-size: cover; background-position: center;">
+
+    <!-- Contenedor para notificaciones estilo toast -->
+    <div id="toast-container" style="position: fixed; top: 20px; right: 20px; z-index: 100000;"></div>
+
+    <div class="menu-container">
+        <div class="left-panel">
+            <h1 id="GESTAC">GESTAC</h1>
+        </div>
+        <div class="right-panel">
+            <div class="modules-grid">
+                <!-- Módulo Activos con submenu a la izquierda -->
+                <div class="module-card has-submenu">
+                    <img src="../IMG/activos.png" alt="Activos" class="module-img">
+                    <span class="module-text">ACTIVOS</span>
+                    <div class="submenu left-submenu">
+                        <a href="#" id="btnNuevoActivo">NUEVO ACTIVO</a>
+                        <a href="#">MODIFICAR ACTIVO</a>
+                        <a href="#">VER ACTIVO</a>
+                    </div>
+                </div>
+
+                <!-- Módulo Asignar con submenu a la derecha -->
+                <div class="module-card has-submenu">
+                    <img src="../IMG/asignar.png" alt="Asignar" class="module-img">
+                    <span class="module-text">ASIGNAR</span>
+                    <div class="submenu right-submenu">
+                        <a href="#">ASIGNAR ACTIVOS</a>
+                        <a href="#">MODIFICAR</a>
+                        <a href="#">VER USUARIO</a>
+                    </div>
+                </div>
+
+                <!-- Otros módulos simples -->
+                <a href="#" class="module-card">
+                    <img src="../IMG/perifericos.png" alt="Periféricos" class="module-img">
+                    <span class="module-text">INVENTARIO PERIFÉRICOS</span>
+                </a>
+
+                <a href="#" class="module-card">
+                    <img src="../IMG/prestamos.png" alt="Préstamos" class="module-img">
+                    <span class="module-text">ESPECIALES PRÉSTAMOS</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Icono de configuración -->
+    <a href="#" class="config-icon" title="Configuraciones">⚙️</a>
+
+    <!-- Leyenda de usuario -->
+    <div class="user-legend">
+        Usuario: <span id="user-type">USUARIO</span>
+    </div>
+
+    <!-- ===== Modal Nuevo Activo ===== -->
+    <div id="modalNuevoActivo" class="modal">
+        <div class="modal-content">
+            <h2>Nuevo Activo</h2>
+            <form id="formNuevoActivo" method="POST" action="../menu.php">
+                <div class="form-grid">
+                    <div>
+                        <label>Categoria de activo</label>
+                        <div class="custom-select">
+                            <input type="hidden" name="categoria">
+                            <span class="select-selected">Seleccionar</span>
+                            <div class="select-items select-hide">
+                                <div>Laptop</div>
+                                <div>PC</div>
+                                <div>All in one</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label>Cantidad</label>
+                        <div class="custom-select">
+                            <input type="hidden" name="cantidad">
+                            <span class="select-selected">Seleccionar</span>
+                            <div class="select-items select-hide">
+                                <div>1</div>
+                                <div>2</div>
+                                <div>3</div>
+                                <div>4</div>
+                                <div>5</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label>Nombre del producto</label>
+                        <input type="text" name="nombre">
+                    </div>
+                    <div>
+                        <label>Numero de serie</label>
+                        <input type="text" name="id_producto">
+                    </div>
+                    <div class="full-width">
+                        <label>Descripcion del activo</label>
+                        <textarea name="descripcion"></textarea>
+                    </div>
+                    <div>
+                        <label>Marca</label>
+                        <input type="text" name="marca">
+                    </div>
+                    <div>
+                        <label>Procesador</label>
+                        <input type="text" name="procesador">
+                    </div>
+                    <div>
+                        <label>Almacenamiento</label>
+                        <input type="text" name="almacenamiento">
+                    </div>
+                    <div>
+                        <label>RAM</label>
+                        <input type="text" name="ram">
+                    </div>
+                </div>
+                <div class="form-buttons">
+                    <button type="button" id="cancelar">Cancelar</button>
+                    <button type="submit" id="guardar">Guardar Activo</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== Script para abrir/cerrar modal, selects y envío AJAX ===== -->
+<script>
+    const btnNuevoActivo = document.getElementById('btnNuevoActivo');
+    const modalNuevoActivo = document.getElementById('modalNuevoActivo');
+    const btnCancelar = document.getElementById('cancelar');
+    const formNuevoActivo = document.getElementById('formNuevoActivo');
+
+    // ===== Función para mostrar notificación tipo toast =====
+    function showToast(message, success = true){
+        const toast = document.createElement('div');
+        toast.textContent = message;
+        toast.style.background = success ? '#2b5a2b' : '#e74c3c'; // Verde éxito / Rojo error
+        toast.style.color = '#fff';
+        toast.style.padding = '15px 25px';
+        toast.style.borderRadius = '15px';
+        toast.style.boxShadow = '0 4px 20px rgba(0,0,0,0.3)';
+        toast.style.marginTop = '10px';
+        toast.style.fontWeight = '600';
+        toast.style.fontSize = '1em';
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(-20px)';
+        toast.style.transition = 'all 0.5s ease';
+
+        const container = document.getElementById('toast-container');
+        container.appendChild(toast);
+
+        // Aparece
+        setTimeout(() => { toast.style.opacity = '1'; toast.style.transform = 'translateY(0)'; }, 100);
+
+        // Desaparece después de 3.5s
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(-20px)';
+            setTimeout(() => toast.remove(), 500);
+        }, 3500);
+    }
+
+    // Abrir modal
+    btnNuevoActivo.addEventListener('click', (e) => {
+        e.preventDefault();
+        modalNuevoActivo.style.display = 'flex';
+    });
+
+    // Cerrar modal
+    btnCancelar.addEventListener('click', () => {
+        modalNuevoActivo.style.display = 'none';
+    });
+
+    // Cerrar modal si se da click fuera del contenido
+    window.addEventListener('click', (e) => {
+        if(e.target === modalNuevoActivo){
+            modalNuevoActivo.style.display = 'none';
+        }
+    });
+
+    // ===== Custom select (Categoria y Cantidad) =====
+    document.querySelectorAll('.custom-select').forEach(function(selectWrapper){
+        const selected = selectWrapper.querySelector('.select-selected');
+        const items = selectWrapper.querySelector('.select-items');
+        const hiddenInput = selectWrapper.querySelector('input[type=hidden]');
+
+        selected.addEventListener('click', function(e){
+            e.stopPropagation();
+            closeAllSelect(this);
+            items.classList.toggle('show');
+        });
+
+        items.querySelectorAll('div').forEach(function(option){
+            option.addEventListener('click', function(){
+                selected.textContent = this.textContent;
+                hiddenInput.value = this.textContent; // guardar valor real
+                items.classList.remove('show');
+            });
+        });
+    });
+
+    function closeAllSelect(elmnt) {
+        document.querySelectorAll('.select-items').forEach(function(item){
+            if(item.previousSibling !== elmnt){
+                item.classList.remove('show');
+            }
+        });
+    }
+
+    document.addEventListener('click', closeAllSelect);
+
+    // ===== Enviar formulario con AJAX y mostrar toast =====
+    formNuevoActivo.addEventListener('submit', function(e){
+        e.preventDefault();
+
+        const formData = new FormData(formNuevoActivo);
+
+        fetch('../menu.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.success){
+                showToast(data.message, true);
+                formNuevoActivo.reset();
+                modalNuevoActivo.style.display = 'none';
+            } else {
+                showToast('Error al registrar activo: ' + data.message, false);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Ocurrió un error al registrar el activo.', false);
+        });
+    });
+</script>
+
 </body>
 </html>

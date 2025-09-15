@@ -1,0 +1,424 @@
+:root {
+    --primary-green-dark: #1f3b1f;
+    --primary-green-light: #2b4a2b;
+    --accent-green-button: #2b5a2b;
+    --accent-green-button-hover: #3a6d3a;
+    --panel-background: #fdfdfd;
+    --text-dark: #333333;
+    --text-light: #777777;
+    --shadow-main: rgba(0, 0, 0, 0.15);
+}
+
+/* Reset y cuerpo */
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f0f4f2;
+}
+
+/* Contenedor principal */
+.menu-container {
+    display: flex;
+    width: 1000px;
+    max-width: 95%;
+    height: 600px;
+    border-radius: 20px;
+    overflow: visible;
+    box-shadow: 0 20px 40px var(--shadow-main);
+    background-color: var(--panel-background);
+}
+
+/* Panel izquierdo */
+.left-panel {
+    flex: 1.2;
+    background: linear-gradient(145deg, var(--primary-green-dark), var(--primary-green-light));
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#GESTAC {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 52px;
+    font-weight: 900;
+    text-align: center;
+    letter-spacing: 2px;
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.5);
+}
+
+/* Panel derecho */
+.right-panel {
+    flex: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+}
+
+/* Grid de módulos */
+.modules-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px;
+    width: 100%;
+    max-width: 800px;
+    height: 500px;
+    position: relative;
+}
+
+/* Tarjetas de módulos */
+.module-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, var(--accent-green-button), var(--primary-green-light));
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.4em;
+    border-radius: 20px;
+    text-decoration: none;
+    padding: 30px;
+    box-shadow: 0 8px 25px var(--shadow-main);
+    transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+    cursor: pointer;
+    overflow: visible;
+}
+
+/* Imagen dentro de la tarjeta */
+.module-img {
+    width: 65px !important;
+    height: 65px !important;
+    object-fit: contain;
+    margin-bottom: 12px;
+    transition: transform 0.3s ease;
+}
+
+.module-card:hover .module-img {
+    transform: scale(1.2) rotate(5deg);
+}
+
+.module-text {
+    font-size: 1.3em;
+}
+
+/* Hover tarjeta */
+.module-card:hover {
+    background: linear-gradient(135deg, var(--primary-green-light), var(--accent-green-button-hover));
+    box-shadow: 0 15px 35px var(--shadow-main);
+    transform: translateY(-6px) scale(1.03);
+}
+
+/* ========= SUBMENUS UNIFORMES ========= */
+.submenu {
+    display: none;
+    position: absolute;
+    top: 0;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    padding: 15px 0;
+    min-width: 200px;
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.left-submenu {
+    right: 100%;
+    margin-right: 10px;
+}
+
+.right-submenu {
+    left: 100%;
+    margin-left: 10px;
+}
+
+.has-submenu:hover .submenu {
+    display: block;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.submenu a {
+    display: block;
+    padding: 12px 20px;
+    font-size: 1em;
+    color: var(--text-dark);
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: all 0.25s ease;
+    white-space: nowrap;
+}
+
+.submenu a:hover {
+    background: var(--accent-green-button-hover);
+    color: #fff;
+}
+
+/* Icono de configuración */
+.config-icon {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    font-size: 3em;
+    color: var(--accent-green-button);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    z-index: 100;
+}
+
+.config-icon:hover {
+    color: var(--accent-green-button-hover);
+    transform: scale(1.25) rotate(15deg);
+}
+
+/* Leyenda de usuario */
+.user-legend {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    font-size: 1.2em;
+    color: var(--text-light);
+    font-weight: 600;
+    z-index: 100;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .menu-container {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .modules-grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+        max-width: 400px;
+        height: auto;
+    }
+
+    .module-img {
+        width: 55px !important;
+        height: 55px !important;
+    }
+
+    .config-icon {
+        font-size: 2.5em;
+    }
+
+    .user-legend {
+        font-size: 1em;
+    }
+
+    .submenu {
+        left: 100%;
+        top: 0;
+    }
+}
+
+/* ===== Modal Nuevo Activo Horizontal ===== */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.55);
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    padding: 20px;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
+.modal-content {
+    background: linear-gradient(135deg, var(--primary-green-light), var(--accent-green-button));
+    padding: 25px 35px;
+    border-radius: 20px;
+    box-shadow: 0 15px 50px rgba(0,0,0,0.35);
+    width: 800px;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    color: #fff;
+}
+
+/* Título */
+.modal-content h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.8em;
+    color: #f0f4f2;
+    text-shadow: 1px 1px 5px rgba(0,0,0,0.5);
+}
+
+/* Contenedor de campos en 2 columnas */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px 25px;
+}
+
+/* Campos que ocupan toda la fila (textarea y select grandes) */
+.full-width {
+    grid-column: 1 / 3;
+}
+
+/* Etiquetas */
+.modal-content label {
+    font-weight: 600;
+    margin-bottom: 4px;
+    display: block;
+    color: #f0f4f2;
+}
+
+/* Inputs y textarea */
+.modal-content input,
+.modal-content textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #2b4a2b;
+    font-size: 1em;
+    outline: none;
+    transition: all 0.3s ease;
+    background-color: rgba(255,255,255,0.95);
+    color: #333;
+    box-sizing: border-box;
+}
+
+.modal-content textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+/* ===== Custom select para Categoria y Cantidad ===== */
+.custom-select {
+    position: relative;
+    font-size: 1em;
+    user-select: none;
+}
+
+.select-selected {
+    background-color: rgba(255,255,255,0.95);
+    color: #333;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #2b4a2b;
+    cursor: pointer;
+    display: block;
+    box-sizing: border-box;
+}
+
+.select-selected:after {
+    content: "\25BC";
+    float: right;
+    margin-left: 10px;
+    transition: transform 0.3s ease;
+}
+
+.select-selected.select-arrow-active:after {
+    transform: rotate(-180deg);
+}
+
+/* Contenedor de opciones */
+.select-items {
+    position: absolute;
+    background-color: rgba(255,255,255,0.95);
+    border: 1px solid #2b4a2b;
+    border-radius: 10px;
+    z-index: 99;
+    top: 100%;
+    left: 0;
+    right: 0;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    max-height: 150px;
+    overflow-y: auto;
+    display: none;
+}
+
+.select-items div {
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    color: #333;
+}
+
+.select-items div:hover {
+    background-color: var(--accent-green-button);
+    color: #fff;
+}
+
+.select-items.show {
+    display: block;
+}
+
+/* Botones */
+.form-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.form-buttons button {
+    padding: 10px 22px;
+    font-size: 1em;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+#cancelar {
+    background-color: #ccc;
+    color: #333;
+}
+
+#cancelar:hover {
+    background-color: #999;
+    color: #fff;
+}
+
+#guardar {
+    background-color: var(--accent-green-button);
+    color: #fff;
+}
+
+#guardar:hover {
+    background-color: var(--accent-green-button-hover);
+    transform: scale(1.05);
+}
+
+/* Animación fadeIn */
+@keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+
+/* Responsive para pantallas pequeñas */
+@media (max-width: 750px) {
+    .modal-content {
+        width: 100%;
+        padding: 20px;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .full-width {
+        grid-column: 1 / 2;
+    }
+}

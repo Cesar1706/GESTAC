@@ -1,0 +1,270 @@
+/* Variables basadas en el estilo retro final */
+:root {
+    --color-bg-dark: #376f37; 
+    --color-bg-green: #376f37; 
+    --color-text-light: #ffffff;
+    --color-header-green: #4caf50; 
+    --color-text-faded: #a5c3a5; 
+    --color-edit-icon-border: #f5f5f5; 
+    --color-input-bg: #ffffff;
+    --color-search-icon: #6c757d;
+    --color-pagination-current: #f7a14e; 
+}
+
+/* -----------------------------------
+ * Estilos Generales y Contenedor
+ * ----------------------------------- */
+body {
+    font-family: 'Open Sans', sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding-top: 30px;
+}
+
+.container {
+    width: 90%;
+    /* 💥 CAMBIO CLAVE: Aumentar ancho máximo para evitar scroll horizontal */
+    max-width: 1200px; 
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    border-radius: 0; 
+    overflow: hidden;
+    margin-top: 50px; 
+    margin-bottom: 50px;
+}
+
+/* -----------------------------------
+ * Encabezado
+ * ----------------------------------- */
+.header {
+    background-color: var(--color-bg-dark); 
+    color: var(--color-text-light);
+    padding: 20px 30px 5px 30px; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.logo {
+    display: none; 
+}
+
+.title {
+    font-size: 3em; 
+    font-weight: 700;
+    color: var(--color-header-green);
+    letter-spacing: 5px; 
+    text-align: center;
+    width: 100%;
+    margin: 10px 0; 
+}
+
+/* -----------------------------------
+ * Lista de Activos - Contenedor Cuerpo
+ * ----------------------------------- */
+.asset-list-container {
+    background-color: var(--color-bg-green); 
+    padding: 20px 30px 10px 30px;
+    color: var(--color-text-light);
+    border-top: none; 
+    max-height: 80vh; 
+    overflow: hidden;
+}
+
+.list-title {
+    font-size: 1.5em;
+    font-weight: 700;
+    margin-bottom: 20px;
+    margin-left: 0;
+    color: var(--color-text-light);
+}
+
+/* -----------------------------------
+ * Barra de Controles (Búsqueda y Selector)
+ * ----------------------------------- */
+.controls-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 0;
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    background-color: var(--color-input-bg);
+    border-radius: 4px;
+    padding: 10px 12px;
+    width: 60%;
+    max-width: 500px;
+    box-shadow: none;
+    border: none;
+}
+
+.search-icon {
+    color: var(--color-search-icon);
+    margin-right: 10px;
+    font-size: 1em;
+}
+
+.search-box input[type="text"] {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 1em;
+    width: 100%;
+    color: #333;
+}
+
+.dropdown {
+    width: 30%;
+    max-width: 200px;
+    height: 40px;
+    background-color: var(--color-input-bg);
+    border-radius: 4px;
+    border: 1px solid #ccc; 
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+/* -----------------------------------
+ * Contenedor de Scroll de la Tabla
+ * ----------------------------------- */
+.table-scroll-wrapper {
+    max-height: 480px; 
+    overflow-y: auto; 
+    /* Quitamos el overflow-x: hidden si lo tuviera, pero auto/scroll es lo importante */
+    width: 100%; 
+    margin-bottom: 10px; 
+}
+
+.table-scroll-wrapper::-webkit-scrollbar {
+    width: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+.table-scroll-wrapper::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+}
+
+
+/* -----------------------------------
+ * Tabla (Estilo de filas y celdas)
+ * ----------------------------------- */
+.assets-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed; /* 💥 CLAVE: Fija el ancho de la tabla al contenedor */
+}
+
+.assets-table th, .assets-table td {
+    padding: 15px 10px; 
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
+    /* 💥 CAMBIO CLAVE: Permitir que el texto se ajuste si es necesario (para evitar scroll) */
+    white-space: normal; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Cabecera de la tabla */
+.assets-table thead {
+    display: table-header-group; 
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: var(--color-bg-green); 
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.assets-table thead th {
+    font-weight: 700;
+    color: var(--color-text-light);
+    background-color: rgba(0, 0, 0, 0.2); 
+    font-size: 0.9em;
+    text-transform: capitalize;
+}
+
+.assets-table tbody td {
+    color: var(--color-text-light);
+    font-weight: 400;
+    font-size: 0.95em;
+}
+
+/* Estilos de datos */
+.col-id { color: var(--color-text-faded); }
+.assets-table td:nth-child(2) { font-weight: 700; } 
+
+/* 💥 AJUSTE DE ANCHOS (Para un total del 100%) */
+.col-id { width: 10%; }
+.col-titulo { width: 22%; } /* Más espacio para el título */
+.col-categoria { width: 10%; }
+.col-procesador { width: 15%; } 
+.col-caracteristicas { width: 15%; } 
+.col-lote { width: 10%; }
+.col-editar { width: 8%; text-align: center; } /* Botón más compacto */
+
+
+/* Botón de Editar (lápiz) */
+.edit-button {
+    width: 25px; 
+    height: 25px;
+    border-radius: 4px; 
+    background-color: transparent;
+    border: 1px solid var(--color-edit-icon-border); 
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.edit-button:before {
+    content: "✏️"; 
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 14px; 
+    line-height: 1;
+}
+
+/* -----------------------------------
+ * Pie de tabla / Paginación
+ * ----------------------------------- */
+.table-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 10px 20px 0; 
+    border-top: none;
+    background-color: var(--color-bg-green);
+    padding-bottom: 20px; 
+}
+
+.pagination-info {
+    font-size: 0.9em;
+    color: var(--color-text-light);
+}
+
+/* Si usas paginación */
+.page-button {
+    background-color: var(--color-input-bg);
+    color: var(--color-bg-green);
+    border: none;
+    border-radius: 4px;
+    padding: 8px 12px; 
+    font-size: 0.9em;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.page-button.current {
+    background-color: var(--color-pagination-current); 
+    color: var(--color-text-light);
+}

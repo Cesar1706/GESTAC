@@ -11,8 +11,7 @@
 
     <div class="container">
         <header class="header">
-            <div class="logo cecom-logo"></div> 
-            <h1 class="title">CAMBIOS DE ACTIVO</h1>
+            <h1 class="title">MODIFICAR ACTIVO</h1>
         </header>
 
         <div class="asset-list-container">
@@ -25,10 +24,9 @@
                 </div>
 
                 <div class="dropdown">
-                    <select id="tipoFilter" style="width:100%; height:100%; border:none; background:none; color:#000; font-weight:700; cursor:pointer;">
+                    <select id="tipoFilter">
                         <option value="todos">Todos</option>
                     </select>
-                    <span class="dropdown-arrow"></span>
                 </div>
             </div>
 
@@ -49,11 +47,72 @@
                         <tr><td colspan="7" style="text-align:center; padding: 20px;">Cargando activos...</td></tr>
                     </tbody>
                 </table>
-            </div> <div class="table-footer">
+            </div> 
+            <div class="table-footer">
                 <span class="pagination-info">Mostrando Activos 0 de 0</span>
             </div>
         </div>
     </div>
+
+    <div id="modalEditarActivo" class="modal">
+        <div class="modal-content">
+            <h2>Editar Activo</h2>
+            <form id="formEditarActivo" method="POST">
+                <input type="hidden" name="id_producto" id="edit-id_producto">
+
+                <div class="form-grid">
+                    <div>
+                        <label>Número de Serie (ID Producto)</label>
+                        <input type="text" id="edit-id_producto_display" readonly style="background-color: #e9ecef; cursor: not-allowed;">
+                    </div>
+
+                    <div>
+                        <label>Categoria de activo</label>
+                        <select name="categoria" id="edit-categoria" required>
+                            <option value="Laptop">Laptop</option>
+                            <option value="PC">PC</option>
+                            <option value="All in one">All in one</option>
+                        </select>
+                    </div>
+
+                    <div class="full-width">
+                        <label>Número de Lote</label>
+                        <input type="text" name="lote" placeholder="Ej. LOTE-2025-01">
+                    </div>
+
+                    <div>
+                        <label>Nombre del producto</label>
+                        <input type="text" name="nombre">
+                    </div>
+                    <div class="full-width">
+                        <label>Descripcion del activo</label>
+                        <textarea name="descripcion"></textarea>
+                    </div>
+                    <div>
+                        <label>Marca</label>
+                        <input type="text" name="marca">
+                    </div>
+                    <div>
+                        <label>Procesador</label>
+                        <input type="text" name="procesador">
+                    </div>
+                    <div>
+                        <label>Almacenamiento</label>
+                        <input type="text" name="almacenamiento">
+                    </div>
+                    <div>
+                        <label>RAM</label>
+                        <input type="text" name="ram">
+                    </div>
+                </div>
+                <div class="form-buttons">
+                    <button type="button" id="cancelarEditar">Cancelar</button>
+                    <button type="submit" id="guardarCambios">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
 
     <script>
         let activosGlobal = [];
@@ -80,19 +139,19 @@
                     searchInput.addEventListener('input', applyFilters);
                 })
                 .catch(error => {
-                    console.error(error);
+                    console.error('Error al cargar los activos:', error);
                     tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:red;">Error al cargar activos</td></tr>`;
                     paginationInfo.textContent = "Mostrando Activos 0 de 0";
                 });
         }
 
         function applyFilters() {
-            const tipoFilter = document.getElementById('tipoFilter').value.toLowerCase();
+            const tipoFilterValue = document.getElementById('tipoFilter').value.toLowerCase();
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
 
             const filtrados = activosGlobal.filter(activo => {
-                const matchCategoria = tipoFilter === 'todos' || (activo.categoria && activo.categoria.toLowerCase() === tipoFilter);
-                const searchString = `${activo.nombre} ${activo.id_producto} ${activo.procesador} ${activo.ram} ${activo.almacenamiento} ${activo.lote}`.toLowerCase();
+                const matchCategoria = tipoFilterValue === 'todos' || (activo.categoria && activo.categoria.toLowerCase() === tipoFilterValue);
+                const searchString = `${activo.nombre || ''} ${activo.id_producto || ''} ${activo.procesador || ''} ${activo.ram || ''} ${activo.almacenamiento || ''} ${activo.lote || ''}`.toLowerCase();
                 const matchSearch = searchString.includes(searchTerm);
                 return matchCategoria && matchSearch;
             });
@@ -106,7 +165,7 @@
             tableBody.innerHTML = '';
 
             if(activos.length === 0){
-                tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 20px;">No hay activos para mostrar</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 20px;">No se encontraron activos</td></tr>`;
                 paginationInfo.textContent = "Mostrando Activos 0 de 0";
                 return;
             }
@@ -121,21 +180,88 @@
                     <td class="col-caracteristicas">${activo.ram || 'N/A'} / ${activo.almacenamiento || 'N/A'}</td>
                     <td class="col-lote">${activo.lote || 'N/A'}</td>
                     <td class="col-editar">
-                        <button class="edit-button" data-id="${activo.id_producto}" onclick="openModifyForm(event, this.dataset.id)"></button>
+                        <button class="edit-button"></button>
                     </td>
                 `;
+                
+                row.querySelector('.edit-button').addEventListener('click', () => {
+                    openModifyForm(activo);
+                });
                 tableBody.appendChild(row);
             });
 
             paginationInfo.textContent = `Mostrando Activos 1 a ${activos.length} de ${activos.length}`;
         }
 
-        function openModifyForm(event, id_producto) {
-            event.preventDefault();
-            alert('Preparando para modificar el activo con ID: ' + id_producto);
+        function openModifyForm(activo) {
+            const modal = document.getElementById('modalEditarActivo');
+            const form = document.getElementById('formEditarActivo');
+
+            // Llenar los campos del formulario
+            form.querySelector('[name="id_producto"]').value = activo.id_producto; 
+            form.querySelector('#edit-id_producto_display').value = activo.id_producto;
+            form.querySelector('[name="categoria"]').value = activo.categoria || '';
+            form.querySelector('[name="lote"]').value = activo.lote || '';
+            form.querySelector('[name="nombre"]').value = activo.nombre || '';
+            form.querySelector('[name="descripcion"]').value = activo.descripcion || '';
+            form.querySelector('[name="marca"]').value = activo.marca || '';
+            form.querySelector('[name="procesador"]').value = activo.procesador || '';
+            form.querySelector('[name="almacenamiento"]').value = activo.almacenamiento || '';
+            form.querySelector('[name="ram"]').value = activo.ram || '';
+
+            modal.style.display = 'flex';
         }
 
-        document.addEventListener('DOMContentLoaded', loadActivos);
+        document.addEventListener('DOMContentLoaded', () => {
+            loadActivos();
+
+            const modalEditar = document.getElementById('modalEditarActivo');
+            const formEditar = document.getElementById('formEditarActivo');
+            const btnCancelarEditar = document.getElementById('cancelarEditar');
+
+            btnCancelarEditar.addEventListener('click', () => {
+                modalEditar.style.display = 'none';
+            });
+
+            window.addEventListener('click', (event) => {
+                if (event.target == modalEditar) {
+                    modalEditar.style.display = 'none';
+                }
+            });
+
+            formEditar.addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                const formData = new FormData(this);
+                const botonGuardar = document.getElementById('guardarCambios');
+                botonGuardar.textContent = 'Guardando...';
+                botonGuardar.disabled = true;
+
+                // ===== LA CORRECCIÓN ESTÁ AQUÍ =====
+                fetch('../modificar_activo.php', { 
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('¡Activo actualizado correctamente!');
+                        modalEditar.style.display = 'none';
+                        loadActivos();
+                    } else {
+                        alert('Error al actualizar: ' + (data.message || 'Respuesta no válida del servidor.'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error en la petición fetch:', error);
+                    alert('Ocurrió un error de conexión. Inténtalo de nuevo.');
+                })
+                .finally(() => {
+                    botonGuardar.textContent = 'Guardar Cambios';
+                    botonGuardar.disabled = false;
+                });
+            });
+        });
     </script>
 </body>
 </html>

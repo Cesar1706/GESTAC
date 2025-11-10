@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gestión de Usuarios</title>
+  <link rel="stylesheet" href="../CSS/style_modificaractivo.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700;800&display=swap" rel="stylesheet"/>
+</head>
+
+<body style="background-image: url('../IMG/fondo.png'); background-repeat: no-repeat; background-size: cover; background-position: center;">
+
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <h1 class="title">MODIFICAR USUARIO ASIGNADO</h1>
+    </header>
+
+    <!-- Cuerpo -->
+    <div class="asset-list-container">
+      <!-- Título + controles -->
+      <div class="list-header">
+        <h2 class="list-title">Lista de Usuarios</h2>
+
+        <div class="controls-bar">
+          <!-- Búsqueda -->
+          <label class="search-box" aria-label="Buscar usuario">
+            <span class="search-icon" aria-hidden="true">&#x1F50D;</span>
+            <input type="text" id="searchInput" placeholder="Buscar usuario" />
+          </label>
+
+          <!-- NUEVO: Filtro por Ubicación -->
+          <div class="dropdown">
+            <select id="filterUbicacion" aria-label="Filtrar por ubicación">
+              <option value="">Todas las ubicaciones</option>
+              <!-- Se llena dinámicamente -->
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabla -->
+      <div class="table-scroll-wrapper">
+        <table class="assets-table" role="grid">
+          <thead>
+            <tr>
+              <th scope="col">Nomina</th>
+              <th scope="col">Nombre</th>
+              <th scope="col">Ubicación</th>
+              <th scope="col">Activo asignado</th>
+              <th scope="col">Fecha</th>
+              <th scope="col" class="col-editar">Editar</th>
+            </tr>
+          </thead>
+          <tbody id="assets-data">
+            <tr><td colspan="6" class="table-empty">Cargando usuarios...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Footer info -->
+      <div class="table-footer">
+        <span class="pagination-info">Mostrando Usuarios 0 de 0</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div id="modalEditarUsuario" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTituloEditar">
+    <div class="modal-content">
+      <h2 id="modalTituloEditar">Editar Usuario</h2>
+      <form id="formEditarUsuario" method="POST">
+        <input type="hidden" name="nomina" id="edit-nomina">
+
+        <div class="form-grid">
+          <div>
+            <label for="edit-nomina_display">Nómina</label>
+            <input type="text" id="edit-nomina_display" readonly style="background-color: #e9ecef; cursor: not-allowed;">
+          </div>
+
+          <div>
+            <label for="edit-nombre">Nombre</label>
+            <input type="text" id="edit-nombre" name="nombre" required>
+          </div>
+
+          <div>
+            <label for="edit-ubicacion">Ubicación</label>
+            <input type="text" id="edit-ubicacion" name="ubicacion" required>
+          </div>
+
+          <div>
+            <label for="edit-activo">Activo asignado</label>
+            <input type="text" id="edit-activo" name="activo">
+          </div>
+
+          <div>
+            <label for="edit-fecha">Fecha</label>
+            <input type="date" id="edit-fecha" name="fecha">
+          </div>
+        </div>
+
+        <div class="form-buttons">
+          <button type="button" id="cancelarEditar">Cancelar</button>
+          <button type="submit" id="guardarCambios">Guardar Cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- JS -->
+  <script>
+    let usuariosGlobal = [];
+
+    /* ---- Helpers de filtros ---- */
+    function buildUbicaciones(lista) {
+      const select = document.getElementById('filterUbicacion');
+      if (!select) return;
+
+      const ubicaciones = Array.from(
+        new Set((lista || [])
+          .map(u => (u.ubicacion || '').trim())
+          .filter(Boolean))
+      ).sort((a,b) => a.localeCompare(b, 'es', {sensitivity:'base'}));
+
+      select.innerHTML =
+        '<option value="">Todas las ubicaciones</option>' +
+        ubicaciones.map(u => `<option value="${u}">${u}</option>`).join('');
+    }
+
+    function applyFilters() {
+      const term = (document.getElementById('searchInput')?.value || '')
+        .toLowerCase().trim();
+      const ubic = document.getElementById('filterUbicacion')?.value || '';
+
+      const filtered = (usuariosGlobal || []).filter(u => {
+        const matchesUbic = !ubic || (u.ubicacion || '') === ubic;
+        const matchesTerm = !term || [u.nomina, u.nombre, u.ubicacion, u.activo, u.fecha]
+          .some(v => String(v || '').toLowerCase().includes(term));
+        return matchesUbic && matchesTerm;
+      });
+
+      renderTable(filtered);
+    }
+
+    /* ---- Carga y render ---- */
+    function loadUsuarios() {
+      const tableBody = document.getElementById('assets-data');
+      const paginationInfo = document.querySelector('.pagination-info');
+      tableBody.innerHTML = '<tr><td colspan="6" class="table-empty">Cargando usuarios...</td></tr>';
+
+      fetch('../modificar_asignado.php')
+        .then(response => response.json())
+        .then(data => {
+          usuariosGlobal = data.data || [];
+          buildUbicaciones(usuariosGlobal);  // ← llena el combo
+          renderTable(usuariosGlobal);
+        })
+        .catch(error => {
+          console.error('Error al cargar los usuarios:', error);
+          tableBody.innerHTML = '<tr><td colspan="6" class="table-empty" style="color:#ffdddd">Error al cargar usuarios</td></tr>';
+          paginationInfo.textContent = "Mostrando Usuarios 0 de 0";
+        });
+    }
+
+    function renderTable(usuarios) {
+      const tableBody = document.getElementById('assets-data');
+      const paginationInfo = document.querySelector('.pagination-info');
+      tableBody.innerHTML = '';
+
+      if (usuarios.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="6" class="table-empty">No se encontraron usuarios</td></tr>';
+        paginationInfo.textContent = "Mostrando Usuarios 0 de 0";
+        return;
+      }
+
+      usuarios.forEach(usuario => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${usuario.nomina || 'N/A'}</td>
+          <td><strong>${usuario.nombre || 'N/A'}</strong></td>
+          <td>${usuario.ubicacion || 'N/A'}</td>
+          <td>${usuario.activo || 'N/A'}</td>
+          <td>${usuario.fecha || 'N/A'}</td>
+          <td class="col-editar">
+            <button class="edit-button" title="Editar usuario" aria-label="Editar"></button>
+          </td>
+        `;
+
+        row.querySelector('.edit-button').addEventListener('click', () => {
+          openModifyForm(usuario);
+        });
+
+        tableBody.appendChild(row);
+      });
+
+      paginationInfo.textContent = `Mostrando Usuarios 1 a ${usuarios.length} de ${usuarios.length}`;
+    }
+
+    /* ---- Modal ---- */
+    function openModifyForm(usuario) {
+      const modal = document.getElementById('modalEditarUsuario');
+      const form = document.getElementById('formEditarUsuario');
+
+      form.querySelector('[name="nomina"]').value = usuario.nomina || '';
+      document.getElementById('edit-nomina_display').value = usuario.nomina || '';
+      form.querySelector('[name="nombre"]').value = usuario.nombre || '';
+      form.querySelector('[name="ubicacion"]').value = usuario.ubicacion || '';
+      form.querySelector('[name="activo"]').value = usuario.activo || '';
+      form.querySelector('[name="fecha"]').value = usuario.fecha || '';
+
+      modal.style.display = 'flex';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadUsuarios();
+
+      // Listeners de filtros
+      const search = document.getElementById('searchInput');
+      const selUbic = document.getElementById('filterUbicacion');
+      if (search) search.addEventListener('input', applyFilters);
+      if (selUbic) selUbic.addEventListener('change', applyFilters);
+
+      // Modal
+      const modalEditar = document.getElementById('modalEditarUsuario');
+      const formEditar = document.getElementById('formEditarUsuario');
+      const btnCancelarEditar = document.getElementById('cancelarEditar');
+
+      btnCancelarEditar.addEventListener('click', () => {
+        modalEditar.style.display = 'none';
+      });
+
+      window.addEventListener('click', (event) => {
+        if (event.target === modalEditar) {
+          modalEditar.style.display = 'none';
+        }
+      });
+
+      formEditar.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const formData = new FormData(this);
+        const botonGuardar = document.getElementById('guardarCambios');
+        botonGuardar.textContent = 'Guardando...';
+        botonGuardar.disabled = true;
+
+        fetch('../modificar_asignado.php', {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert('¡Usuario actualizado correctamente!');
+            modalEditar.style.display = 'none';
+            loadUsuarios();
+          } else {
+            alert('Error al actualizar: ' + (data.message || 'Respuesta no válida del servidor.'));
+          }
+        })
+        .catch(error => {
+          console.error('Error en la petición fetch:', error);
+          alert('Ocurrió un error de conexión. Inténtalo de nuevo.');
+        })
+        .finally(() => {
+          botonGuardar.textContent = 'Guardar Cambios';
+          botonGuardar.disabled = false;
+        });
+      });
+    });
+  </script>
+</body>
+</html>

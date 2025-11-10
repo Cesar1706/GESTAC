@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gestión de Usuarios</title>
+  <link rel="stylesheet" href="../CSS/style_modificaractivo.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700;800&display=swap" rel="stylesheet"/>
+</head>
+
+<body style="background-image: url('../IMG/fondo.png'); background-repeat: no-repeat; background-size: cover; background-position: center;">
+
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <h1 class="title">VER ACTIVOS ASIGNADOS</h1>
+    </header>
+
+    <!-- Cuerpo -->
+    <div class="asset-list-container">
+      <!-- Título + controles -->
+      <div class="list-header">
+        <h2 class="list-title">Lista de Usuarios</h2>
+
+        <div class="controls-bar">
+          <!-- Búsqueda -->
+          <label class="search-box" aria-label="Buscar usuario">
+            <span class="search-icon" aria-hidden="true">&#x1F50D;</span>
+            <input type="text" id="searchInput" placeholder="Buscar usuario" />
+          </label>
+
+          <!-- Filtro por Ubicación -->
+          <div class="dropdown">
+            <select id="filterUbicacion" aria-label="Filtrar por ubicación">
+              <option value="">Todas las ubicaciones</option>
+              <!-- Se llena dinámicamente -->
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabla -->
+      <div class="table-scroll-wrapper">
+        <table class="assets-table" role="grid">
+          <thead>
+            <tr>
+              <th scope="col">Nomina</th>
+              <th scope="col">Nombre</th>
+              <th scope="col">Ubicación</th>
+              <th scope="col">Activo asignado</th>
+              <th scope="col">Fecha</th>
+            </tr>
+          </thead>
+          <tbody id="assets-data">
+            <tr><td colspan="5" class="table-empty">Cargando usuarios...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Footer info -->
+      <div class="table-footer">
+        <span class="pagination-info">Mostrando Usuarios 0 de 0</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- JS -->
+  <script>
+    let usuariosGlobal = [];
+
+    /* ---- Helpers de filtros ---- */
+    function buildUbicaciones(lista) {
+      const select = document.getElementById('filterUbicacion');
+      if (!select) return;
+
+      const ubicaciones = Array.from(
+        new Set((lista || [])
+          .map(u => (u.ubicacion || '').trim())
+          .filter(Boolean))
+      ).sort((a,b) => a.localeCompare(b, 'es', {sensitivity:'base'}));
+
+      select.innerHTML =
+        '<option value="">Todas las ubicaciones</option>' +
+        ubicaciones.map(u => `<option value="${u}">${u}</option>`).join('');
+    }
+
+    function applyFilters() {
+      const term = (document.getElementById('searchInput')?.value || '')
+        .toLowerCase().trim();
+      const ubic = document.getElementById('filterUbicacion')?.value || '';
+
+      const filtered = (usuariosGlobal || []).filter(u => {
+        const matchesUbic = !ubic || (u.ubicacion || '') === ubic;
+        const matchesTerm = !term || [u.nomina, u.nombre, u.ubicacion, u.activo, u.fecha]
+          .some(v => String(v || '').toLowerCase().includes(term));
+        return matchesUbic && matchesTerm;
+      });
+
+      renderTable(filtered);
+    }
+
+    /* ---- Carga y render ---- */
+    function loadUsuarios() {
+      const tableBody = document.getElementById('assets-data');
+      const paginationInfo = document.querySelector('.pagination-info');
+      tableBody.innerHTML = '<tr><td colspan="5" class="table-empty">Cargando usuarios...</td></tr>';
+
+      fetch('../modificar_asignado.php')
+        .then(response => response.json())
+        .then(data => {
+          usuariosGlobal = data.data || [];
+          buildUbicaciones(usuariosGlobal);  // llena el combo
+          renderTable(usuariosGlobal);
+        })
+        .catch(error => {
+          console.error('Error al cargar los usuarios:', error);
+          tableBody.innerHTML = '<tr><td colspan="5" class="table-empty" style="color:#ffdddd">Error al cargar usuarios</td></tr>';
+          paginationInfo.textContent = "Mostrando Usuarios 0 de 0";
+        });
+    }
+
+    function renderTable(usuarios) {
+      const tableBody = document.getElementById('assets-data');
+      const paginationInfo = document.querySelector('.pagination-info');
+      tableBody.innerHTML = '';
+
+      if (usuarios.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="5" class="table-empty">No se encontraron usuarios</td></tr>';
+        paginationInfo.textContent = "Mostrando Usuarios 0 de 0";
+        return;
+      }
+
+      usuarios.forEach(usuario => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${usuario.nomina || 'N/A'}</td>
+          <td><strong>${usuario.nombre || 'N/A'}</strong></td>
+          <td>${usuario.ubicacion || 'N/A'}</td>
+          <td>${usuario.activo || 'N/A'}</td>
+          <td>${usuario.fecha || 'N/A'}</td>
+        `;
+        tableBody.appendChild(row);
+      });
+
+      paginationInfo.textContent = `Mostrando Usuarios 1 a ${usuarios.length} de ${usuarios.length}`;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadUsuarios();
+
+      // Listeners de filtros (búsqueda + ubicación)
+      const search = document.getElementById('searchInput');
+      const selUbic = document.getElementById('filterUbicacion');
+      if (search) search.addEventListener('input', applyFilters);
+      if (selUbic) selUbic.addEventListener('change', applyFilters);
+    });
+  </script>
+</body>
+</html>

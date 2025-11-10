@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Inventario de Periféricos</title>
+
+  <link rel="stylesheet" href="../CSS/style_inventario.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700;800&display=swap" rel="stylesheet"/>
+
+  <style>
+    /* Miniestilos para el botón Eliminar (si tu CSS global ya lo tiene, puedes quitar esto) */
+    .delete-col { width: 110px; text-align: center; }
+    .btn-delete {
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,.6);
+      background: #9b2c2c;
+      color: #fff;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform .12s ease, opacity .2s ease;
+    }
+    .btn-delete:hover { transform: translateY(-1px); opacity: .95; }
+    .btn-delete:active { transform: scale(.98); }
+    .btn-delete[disabled] { opacity: .6; cursor: not-allowed; }
+  </style>
+</head>
+
+<body style="background-image:url('../IMG/fondo.png'); background-repeat:no-repeat; background-size:cover; background-position:center;">
+  <div class="container">
+    <header class="header">
+      <h1 class="title">INVENTARIO DE PERIFÉRICOS</h1>
+    </header>
+
+    <div class="inventory-container">
+      <div class="list-header">
+        <h2 class="list-title">Altas y consulta</h2>
+        <div class="controls-bar">
+          <label class="search-box" aria-label="Buscar periférico">
+            <span class="search-icon" aria-hidden="true">&#x1F50D;</span>
+            <input type="text" id="searchInput" placeholder="Buscar por nombre o serie" />
+          </label>
+        </div>
+      </div>
+
+      <!-- Formulario -->
+      <section class="form-card">
+        <form id="formInventario" autocomplete="off">
+          <div class="form-grid">
+            <div>
+              <label for="nombre">Nombre del periférico</label>
+              <input type="text" id="nombre" name="nombre" required />
+            </div>
+            <div>
+              <label for="sn">Número de serie (S/N)</label>
+              <input type="text" id="sn" name="sn" required />
+            </div>
+          </div>
+          <div class="form-buttons">
+            <button type="submit" id="btnAgregar">Agregar al Inventario</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Tabla -->
+      <div class="table-scroll-wrapper">
+        <table class="assets-table" id="tablaPerifericos" role="grid">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>S/N</th>
+              <th class="delete-col">Eliminar</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="3" class="table-empty">Cargando periféricos...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="table-footer">
+        <span class="pagination-info" id="infoInventario">Mostrando 0 de 0</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const ENDPOINT = '../inventario_perifericos.php'; // PHP fuera de la carpeta del HTML
+    let inventario = []; // estado local
+
+    const tablaBody = document.querySelector('#tablaPerifericos tbody');
+    const form = document.getElementById('formInventario');
+    const info = document.getElementById('infoInventario');
+    const search = document.getElementById('searchInput');
+
+    // Renderiza tabla con una lista dada
+    function renderTabla(lista) {
+      tablaBody.innerHTML = '';
+      if (!lista.length) {
+        tablaBody.innerHTML = '<tr><td colspan="3" class="table-empty">Sin resultados</td></tr>';
+        info.textContent = `Mostrando 0 de ${inventario.length}`;
+        return;
+      }
+      lista.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${item.nombre ?? ''}</td>
+          <td>${item.sn ?? ''}</td>
+          <td class="delete-col">
+            <button class="btn-delete" data-id="${item.id}">Eliminar</button>
+          </td>
+        `;
+        // Click eliminar
+        tr.querySelector('.btn-delete').addEventListener('click', async (e) => {
+          const id = e.currentTarget.getAttribute('data-id');
+          await eliminarItem(id, e.currentTarget);
+        });
+
+        tablaBody.appendChild(tr);
+      });
+      info.textContent = `Mostrando ${lista.length} de ${inventario.length}`;
+    }
+
+    // Filtro por texto
+    function applyFilter() {
+      const term = (search?.value || '').toLowerCase().trim();
+      if (!term) return renderTabla(inventario);
+      const filtered = inventario.filter(p =>
+        [p.nombre, p.sn].some(v => String(v || '').toLowerCase().includes(term))
+      );
+      renderTabla(filtered);
+    }
+
+    // Cargar lista desde PHP (GET)
+    async function cargarInventario() {
+      tablaBody.innerHTML = '<tr><td colspan="3" class="table-empty">Cargando periféricos...</td></tr>';
+      try {
+        const res = await fetch(`${ENDPOINT}?action=list`, { cache: 'no-store' });
+        const data = await res.json();
+        if (data.success) {
+          inventario = data.data || [];
+          applyFilter(); // respeta el filtro actual
+        } else {
+          throw new Error(data.message || 'Respuesta no válida del servidor');
+        }
+      } catch (err) {
+        console.error(err);
+        tablaBody.innerHTML = '<tr><td colspan="3" class="table-empty" style="color:#ffdede">Error al cargar datos</td></tr>';
+        info.textContent = 'Mostrando 0 de 0';
+      }
+    }
+
+    // Insertar nuevo (POST)
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const nombre = document.getElementById('nombre').value.trim();
+      const sn = document.getElementById('sn').value.trim();
+      if (!nombre || !sn) return;
+
+      const btn = document.getElementById('btnAgregar');
+      btn.disabled = true; btn.textContent = 'Agregando...';
+
+      try {
+        const formData = new FormData();
+        formData.append('action', 'insert');
+        formData.append('nombre', nombre);
+        formData.append('sn', sn);
+
+        const res = await fetch(ENDPOINT, { method: 'POST', body: formData });
+        const data = await res.json();
+
+        if (data.success) {
+          form.reset();
+          await cargarInventario(); // recarga lista desde BD
+          alert('¡Periférico agregado con éxito!');
+        } else {
+          throw new Error(data.message || 'No se pudo insertar');
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Ocurrió un error al insertar. Revisa la consola.');
+      } finally {
+        btn.disabled = false; btn.textContent = 'Agregar al Inventario';
+      }
+    });
+
+    // Eliminar (POST)
+    async function eliminarItem(id, btn) {
+      if (!id) return;
+      const ok = confirm('¿Seguro que deseas eliminar este elemento?');
+      if (!ok) return;
+
+      const oldText = btn.textContent;
+      btn.disabled = true; btn.textContent = 'Eliminando...';
+
+      try {
+        const fd = new FormData();
+        fd.append('action', 'delete');
+        fd.append('id', id);
+
+        const res = await fetch(ENDPOINT, { method: 'POST', body: fd });
+        const data = await res.json();
+
+        if (data.success) {
+          await cargarInventario();
+        } else {
+          alert('No se pudo eliminar: ' + (data.message || 'Error'));
+        }
+      } catch (e) {
+        console.error(e);
+        alert('Error de conexión al eliminar.');
+      } finally {
+        btn.disabled = false; btn.textContent = oldText;
+      }
+    }
+
+    search.addEventListener('input', applyFilter);
+    document.addEventListener('DOMContentLoaded', cargarInventario);
+  </script>
+</body>
+</html>

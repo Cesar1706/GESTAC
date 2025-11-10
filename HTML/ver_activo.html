@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualización de Activos</title>
+    <link rel="stylesheet" href="../CSS/style_modificaractivo.css"> 
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Estilos para ajustar el ancho de las columnas sin la de Editar */
+        .col-id { width: 10%; }
+        .col-titulo { width: 25%; }
+        .col-categoria { width: 15%; }
+        .col-procesador { width: 15%; } 
+        .col-caracteristicas { width: 20%; } 
+        .col-lote { width: 15%; }
+    </style>
+</head>
+<body style="background-image: url('../IMG/fondo.png'); background-repeat: no-repeat; background-size: cover; background-position: center;">
+
+    <div class="container">
+        <header class="header">
+            <h1 class="title">VISUALIZACIÓN DE ACTIVOS</h1>
+        </header>
+
+        <div class="asset-list-container">
+            <h2 class="list-title">Lista de Activos</h2>
+            
+            <div class="controls-bar">
+                <div class="search-box">
+                    <span class="search-icon">&#x1F50D;</span> 
+                    <input type="text" id="searchInput" placeholder="Buscar activo">
+                </div>
+
+                <div class="dropdown">
+                    <select id="tipoFilter">
+                        <option value="todos">Todos</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="table-scroll-wrapper"> 
+                <table class="assets-table">
+                    <thead>
+                        <tr>
+                            <th class="col-id">ID Producto</th>
+                            <th class="col-titulo">Título</th>
+                            <th class="col-categoria">Categoría</th>
+                            <th class="col-procesador">Procesador</th>
+                            <th class="col-caracteristicas">Características</th>
+                            <th class="col-lote">Lote</th>
+                            </tr>
+                    </thead>
+                    <tbody id="assets-data">
+                        <tr><td colspan="6" style="text-align:center; padding: 20px;">Cargando activos...</td></tr>
+                    </tbody>
+                </table>
+            </div> 
+            <div class="table-footer">
+                <span class="pagination-info">Mostrando Activos 0 de 0</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let activosGlobal = [];
+
+        function loadActivos() {
+            const tableBody = document.getElementById('assets-data');
+            const paginationInfo = document.querySelector('.pagination-info');
+            const tipoFilter = document.getElementById('tipoFilter');
+            const searchInput = document.getElementById('searchInput');
+
+            tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 20px;">Cargando activos...</td></tr>';
+
+            fetch('../modificar_activo.php') // Este script ahora solo se usa para leer (GET)
+                .then(response => response.json())
+                .then(data => {
+                    activosGlobal = data.data || [];
+                    renderTable(activosGlobal);
+
+                    const categorias = Array.from(new Set(activosGlobal.map(a => a.categoria).filter(Boolean)));
+                    tipoFilter.innerHTML = '<option value="todos">Todos</option>' +
+                        categorias.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+
+                    tipoFilter.addEventListener('change', applyFilters);
+                    searchInput.addEventListener('input', applyFilters);
+                })
+                .catch(error => {
+                    console.error('Error al cargar los activos:', error);
+                    tableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:red;">Error al cargar activos</td></tr>`;
+                    paginationInfo.textContent = "Mostrando Activos 0 de 0";
+                });
+        }
+
+        function applyFilters() {
+            const tipoFilterValue = document.getElementById('tipoFilter').value.toLowerCase();
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+
+            const filtrados = activosGlobal.filter(activo => {
+                const matchCategoria = tipoFilterValue === 'todos' || (activo.categoria && activo.categoria.toLowerCase() === tipoFilterValue);
+                const searchString = `${activo.nombre || ''} ${activo.id_producto || ''} ${activo.procesador || ''} ${activo.ram || ''} ${activo.almacenamiento || ''} ${activo.lote || ''}`.toLowerCase();
+                const matchSearch = searchString.includes(searchTerm);
+                return matchCategoria && matchSearch;
+            });
+
+            renderTable(filtrados);
+        }
+
+        function renderTable(activos) {
+            const tableBody = document.getElementById('assets-data');
+            const paginationInfo = document.querySelector('.pagination-info');
+            tableBody.innerHTML = '';
+
+            if(activos.length === 0){
+                tableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 20px;">No se encontraron activos</td></tr>`;
+                paginationInfo.textContent = "Mostrando Activos 0 de 0";
+                return;
+            }
+
+            activos.forEach(activo => {
+                const row = document.createElement('tr');
+                // Se eliminó la celda (td) y el botón de editar
+                row.innerHTML = `
+                    <td class="col-id">#${activo.id_producto}</td>
+                    <td class="col-titulo"><strong>${activo.nombre || 'N/A'}</strong></td>
+                    <td class="col-categoria">${activo.categoria || 'N/A'}</td>
+                    <td class="col-procesador">${activo.procesador || 'N/A'}</td>
+                    <td class="col-caracteristicas">${activo.ram || 'N/A'} / ${activo.almacenamiento || 'N/A'}</td>
+                    <td class="col-lote">${activo.lote || 'N/A'}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+
+            paginationInfo.textContent = `Mostrando Activos 1 a ${activos.length} de ${activos.length}`;
+        }
+        
+        // Se eliminaron las funciones y listeners relacionados con la edición
+        document.addEventListener('DOMContentLoaded', () => {
+            loadActivos();
+        });
+    </script>
+</body>
+</html>

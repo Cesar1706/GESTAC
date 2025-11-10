@@ -1,0 +1,143 @@
+ /* ================= Variables base ================= */
+    :root{
+      --primary-green-dark:#1f3b1f;
+      --primary-green-light:#2b4a2b;
+      --accent-green-button:#2b5a2b;
+      --accent-green-button-hover:#3a6d3a;
+
+      --panel-background:#fdfdfd;
+      --text-dark:#333;
+      --text-light:#d9ead3;
+      --shadow-main:rgba(0,0,0,.35);
+
+      --radius:16px;
+    }
+
+    /* ================= Layout general ================= */
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:'Open Sans',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      display:flex; align-items:flex-start; justify-content:center;
+      padding:40px 16px;
+      background:#0f1f0f;  /* fallback si no hay imagen */
+    }
+
+    /* Card contenedora */
+    .container{
+      width:min(1100px,100%);
+      border-radius:var(--radius);
+      overflow:hidden;
+      box-shadow:0 18px 44px var(--shadow-main);
+      border:1px solid rgba(255,255,255,.08);
+      backdrop-filter:saturate(110%) blur(1px);
+    }
+
+    /* Header */
+    .header{
+      background:linear-gradient(180deg, var(--primary-green-light), var(--accent-green-button));
+      padding:28px 28px 18px;
+      text-align:center;
+    }
+    .title{
+      margin:0;
+      letter-spacing:4px;
+      font-weight:800;
+      font-size:clamp(22px,3.2vw,40px);
+      color:#a8d5a8;
+    }
+
+    /* Cuerpo */
+    .inventory-container{
+      background:linear-gradient(180deg, #214a26, var(--primary-green-light));
+      padding:22px 24px 16px;
+      color:#fff;
+    }
+
+    /* Título + controles */
+    .list-header{
+      display:grid; grid-template-columns:1fr auto; gap:12px; align-items:end;
+      margin-bottom:12px;
+    }
+    .list-title{ margin:0; font-size:clamp(16px,2vw,22px); font-weight:800 }
+
+    /* Buscador */
+    .controls-bar{ display:flex; align-items:center; gap:12px }
+    .search-box{
+      display:flex; align-items:center; gap:10px;
+      background:#fff; color:#333;
+      padding:10px 12px; border-radius:12px; border:1px solid #e7efe7;
+      min-width:min(360px, 72vw);
+      box-shadow:0 2px 10px rgba(0,0,0,.08) inset;
+    }
+    .search-icon{ font-size:18px; opacity:.65 }
+    .search-box input{
+      border:0; outline:0; background:transparent; font-size:15px; width:100%; color:#222;
+    }
+
+    /* Tarjeta de formulario */
+    .form-card{
+      background:var(--panel-background);
+      border-radius:14px;
+      box-shadow:0 10px 26px rgba(0,0,0,.25);
+      border:1px solid rgba(0,0,0,.06);
+      padding:18px 16px;
+      margin:10px 0 14px;
+      color:var(--text-dark);
+    }
+    .form-grid{
+      display:grid; grid-template-columns:repeat(2,1fr); gap:14px 20px;
+    }
+    .form-card label{
+      font-weight:800; color:#214a26; margin-bottom:6px; display:block;
+    }
+    .form-card input{
+      width:100%; padding:12px 12px; border-radius:12px; border:1px solid #214a26;
+      background:#fff; color:#222; font-size:15px; outline:none;
+    }
+    .form-buttons{ display:flex; justify-content:flex-end; gap:10px; margin-top:12px }
+    #btnAgregar{
+      padding:11px 18px; border-radius:12px; border:0; font-weight:800; cursor:pointer;
+      background:var(--accent-green-button); color:#fff;
+      box-shadow:0 6px 16px rgba(0,0,0,.18);
+      transition:transform .12s ease, background .2s ease;
+    }
+    #btnAgregar:hover{ background:var(--accent-green-button-hover); transform:translateY(-1px) }
+    #btnAgregar:active{ transform:scale(.98) }
+
+    /* Tabla con cabecera sticky */
+    .table-scroll-wrapper{
+      max-height:480px; overflow:auto;
+      border-radius:12px; border:1px solid rgba(255,255,255,.12);
+      background:rgba(0,0,0,.06); margin-top:8px;
+    }
+    .table-scroll-wrapper::-webkit-scrollbar{width:10px;height:10px}
+    .table-scroll-wrapper::-webkit-scrollbar-thumb{background:rgba(255,255,255,.28);border-radius:10px}
+
+    .assets-table{ width:100%; border-collapse:separate; border-spacing:0; table-layout:fixed }
+    .assets-table thead{
+      position:sticky; top:0; z-index:2;
+      background:linear-gradient(180deg, #1e4222, #214a26);
+      box-shadow:0 2px 0 rgba(0,0,0,.15);
+    }
+    .assets-table th, .assets-table td{
+      padding:14px 12px; border-bottom:1px solid rgba(255,255,255,.12);
+      text-align:left; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+    }
+    .assets-table th{ font-size:.92rem; font-weight:800; color:#dfefdf; letter-spacing:.3px }
+    .assets-table tbody td{ font-size:.97rem; color:#fff }
+    .assets-table tbody tr:nth-child(odd){ background:rgba(255,255,255,.03) }
+    .assets-table tbody tr:hover{ background:rgba(255,255,255,.08); transition:background .2s }
+
+    .table-empty{ text-align:center!important; padding:22px 12px!important; color:#dfefdf }
+    .table-footer{ display:flex; justify-content:flex-end; padding:12px 4px 6px; color:#dfefdf; font-size:.93rem }
+
+    /* Responsive */
+    @media (max-width: 860px){
+      .list-header{ grid-template-columns:1fr }
+      .controls-bar{ justify-content:stretch }
+      .search-box{ min-width:0; width:100% }
+      .form-grid{ grid-template-columns:1fr }
+      .assets-table td{ white-space:normal }
+    }

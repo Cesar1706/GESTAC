@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Préstamo de Periféricos</title>
+
+  <link rel="stylesheet" href="../CSS/style_prest.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700;800&display=swap" rel="stylesheet"/>
+</head>
+
+<body>
+  <div class="container">
+    <header class="header">
+      <h1 class="title">PRÉSTAMO DE PERIFÉRICOS</h1>
+    </header>
+
+    <div class="inventory-container">
+      <!-- Header + controles -->
+      <div class="list-header">
+        <h2 class="list-title">Altas de préstamo &amp; consulta</h2>
+        <div class="controls-bar">
+          <label class="search-box" aria-label="Buscar en préstamos">
+            <span class="search-icon">🔎</span>
+            <input id="txtBuscar" type="search" placeholder="Buscar por usuario, equipo o serie…">
+          </label>
+          <button id="btnNuevo" class="btn" type="button">➕ Nuevo préstamo</button>
+        </div>
+      </div>
+
+      <!-- Formulario (sin inventario en pantalla) -->
+      <section id="formPrestamo" class="form-card hidden" aria-live="polite">
+        <h3 class="section-title" style="color:#214a26">Registrar nuevo préstamo</h3>
+        <div class="form-grid">
+          <div>
+            <label for="selUsuario">Nombre de la persona</label>
+            <select id="selUsuario" required>
+              <option selected disabled>Cargando usuarios…</option>
+            </select>
+          </div>
+          <div>
+            <label for="inpEquipo">Equipo</label>
+            <input id="inpEquipo" type="text" placeholder="Se autocompleta según la serie" readonly>
+          </div>
+          <div>
+            <label for="selSerie">Número de serie</label>
+            <select id="selSerie" required>
+              <option selected disabled>Cargando series…</option>
+            </select>
+          </div>
+          <div>
+            <label for="inpFechaPrestamo">Fecha de préstamo</label>
+            <input id="inpFechaPrestamo" type="date" required>
+          </div>
+          <div>
+            <label for="inpFechaDevolucion">Fecha de devolución</label>
+            <input id="inpFechaDevolucion" type="date" required>
+          </div>
+        </div>
+        <div class="form-buttons">
+          <button id="btnCancelar" class="btn" type="button" style="background:#6b6b6b">Cancelar</button>
+          <button id="btnAgregar" class="btn" type="button">Agregar préstamo</button>
+        </div>
+        <p id="msgError" style="margin:8px 2px 0; color:#b00020; font-weight:700"></p>
+      </section>
+
+      <!-- Préstamos (única tabla visible) -->
+      <h3 class="section-title" style="margin-top:6px">Préstamos</h3>
+      <div class="table-scroll-wrapper" role="region" aria-label="Tabla de préstamos">
+        <table class="assets-table" id="tblPrestamos">
+          <thead>
+            <tr>
+              <th style="width:22%">Usuario</th>
+              <th style="width:22%">Equipo</th>
+              <th style="width:16%">N.º Serie</th>
+              <th style="width:16%">Fecha préstamo</th>
+              <th style="width:16%">Fecha devolución</th>
+              <th style="width:8%">Estado</th>
+              <th style="width:12%">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="prestBody">
+            <tr><td class="table-empty" colspan="7">Sin préstamos…</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="table-footer">
+        <span id="resumen"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================= SCRIPT ======================= -->
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    /* ===== ENDPOINTS API (solo lectura para el formulario) =====
+       Ajusta estas rutas a tu backend real.
+       - GET /api/usuarios        -> [{ nombre }]
+       - GET /api/perifericos     -> [{ nombre, sn }]
+       Nota: en SQL, usa   SELECT nombre, `S/N` AS sn FROM inventario_periferico;
+    */
+    const API = {
+      usuarios: '/api/usuarios',
+      perifericos: '/api/perifericos'
+    };
+
+    // --- Storage clave (seguimos guardando préstamos localmente)
+    const LS_PRE = 'prestamos.php';
+
+    // --- Helpers
+    const hoyISO = () => new Date().toISOString().slice(0,10);
+    const norm = (s) => (s||'').toString().toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu,'');
+    const loadLS = (k,f)=>{ try{const r=localStorage.getItem(k); return r?JSON.parse(r):f;}catch(e){return f} };
+    const saveLS = (k,v)=> localStorage.setItem(k, JSON.stringify(v));
+
+    // --- Estado
+    let prestamos = loadLS(LS_PRE, []);
+    let cacheUsuarios = [];           // [{nombre}]
+    let cachePerifericos = [];        // [{nombre, sn}]
+    let mapSerieToEquipo = new Map(); // sn -> equipo nombre
+
+    // --- Refs
+    const prestBody = document.getElementById('prestBody');
+    const resumen   = document.getElementById('resumen');
+    const btnNuevo  = document.getElementById('btnNuevo');
+    const btnCancelar = document.getElementById('btnCancelar');
+    const btnAgregar  = document.getElementById('btnAgregar');
+    const formPrestamo= document.getElementById('formPrestamo');
+    const msgError    = document.getElementById('msgError');
+
+    const selUsuario  = document.getElementById('selUsuario');
+    const inpEquipo   = document.getElementById('inpEquipo');
+    const selSerie    = document.getElementById('selSerie');
+    const inpFechaPrestamo   = document.getElementById('inpFechaPrestamo');
+    const inpFechaDevolucion = document.getElementById('inpFechaDevolucion');
+    const txtBuscar = document.getElementById('txtBuscar');
+
+    // --- Fetch helpers
+    async function apiGet(url){
+      const r = await fetch(url, {headers:{'Accept':'application/json'}});
+      if(!r.ok) throw new Error(`GET ${url} -> ${r.status}`);
+      return await r.json();
+    }
+
+    // --- Carga de datos para el formulario ---
+    async function cargarUsuarios(){
+      selUsuario.innerHTML = '<option selected disabled>Cargando usuarios…</option>';
+      const data = await apiGet(API.usuarios); // [{nombre}]
+      cacheUsuarios = Array.isArray(data) ? data : [];
+      if(!cacheUsuarios.length){
+        selUsuario.innerHTML = '<option selected disabled>No hay usuarios</option>';
+        return;
+      }
+      selUsuario.innerHTML =
+        '<option value="" selected disabled>Selecciona un usuario…</option>' +
+        cacheUsuarios
+          .filter(u => u && u.nombre)
+          .sort((a,b)=> a.nombre.localeCompare(b.nombre,'es'))
+          .map(u=>`<option value="${u.nombre}">${u.nombre}</option>`)
+          .join('');
+    }
+
+    async function cargarPerifericos(){
+      selSerie.innerHTML = '<option selected disabled>Cargando series…</option>';
+      const data = await apiGet(API.perifericos); // [{nombre, sn}]
+      cachePerifericos = Array.isArray(data) ? data : [];
+      mapSerieToEquipo = new Map(cachePerifericos.map(p => [String(p.sn), String(p.nombre)]));
+      if(!cachePerifericos.length){
+        selSerie.innerHTML = '<option selected disabled>No hay series</option>';
+        inpEquipo.value = '';
+        return;
+      }
+      selSerie.innerHTML =
+        '<option value="" selected disabled>Selecciona una serie…</option>' +
+        cachePerifericos
+          .filter(p => p && p.sn && p.nombre)
+          .sort((a,b)=> String(a.sn).localeCompare(String(b.sn),'es',{numeric:true}))
+          .map(p=>`<option value="${p.sn}">${p.sn} — ${p.nombre}</option>`)
+          .join('');
+    }
+
+    // --- Render préstamos ---
+    function renderPrestamos(){
+      let data = prestamos.slice().sort((a,b)=> (a.estado===b.estado)?0:(a.estado==='Activo'?-1:1));
+      const q = norm(txtBuscar.value);
+      if(q){
+        data = data.filter(p =>
+          norm(p.usuario).includes(q) ||
+          norm(p.equipoNombre).includes(q) ||
+          norm(p.serie).includes(q)
+        );
+      }
+      if(!data.length){
+        prestBody.innerHTML = '<tr><td class="table-empty" colspan="7">Sin préstamos…</td></tr>';
+      }else{
+        prestBody.innerHTML = data.map(p=>{
+          const hoy = hoyISO();
+          const vencido = (p.estado==='Activo' && p.fechaDevolucion && p.fechaDevolucion < hoy);
+          const estadoChip = p.estado==='Activo'
+            ? `<span class="chip${vencido?' warn':''}">${vencido?'Vencido':'Activo'}</span>`
+            : '<span class="chip">Devuelto</span>';
+          const btnDev = p.estado==='Activo'
+            ? `<button class="btn" style="padding:8px 12px" data-devuelve="${p.id}">Devolver</button>`
+            : '<span style="opacity:.6">—</span>';
+          return `<tr>
+            <td title="${p.usuario}">${p.usuario}</td>
+            <td>${p.equipoNombre}</td>
+            <td>${p.serie}</td>
+            <td>${p.fechaPrestamo||''}</td>
+            <td>${p.fechaDevolucion||''}</td>
+            <td>${estadoChip}</td>
+            <td>${btnDev}</td>
+          </tr>`;
+        }).join('');
+      }
+      const activos = prestamos.filter(p=>p.estado==='Activo').length;
+      const devueltos = prestamos.length - activos;
+      resumen.textContent = `Préstamos: ${prestamos.length} • Activos: ${activos} • Devueltos: ${devueltos}`;
+
+      // Delegar evento Devolver
+      prestBody.querySelectorAll('[data-devuelve]').forEach(btn=>{
+        btn.addEventListener('click', ()=> devolverPrestamo(btn.getAttribute('data-devuelve')));
+      });
+    }
+
+    // --- Form ---
+    function toggleForm(show){
+      formPrestamo.classList.toggle('hidden', !show);
+      msgError.textContent = '';
+      if(show){
+        selUsuario.value = '';
+        selSerie.value   = '';
+        inpEquipo.value  = '';
+        inpFechaPrestamo.value = hoyISO();
+        inpFechaDevolucion.value = '';
+        selUsuario.focus();
+      }
+    }
+
+    function validar(){
+      const usuario = selUsuario.value;
+      const serie   = selSerie.value;
+      const equipo  = inpEquipo.value.trim();
+      const fP      = inpFechaPrestamo.value;
+      const fD      = inpFechaDevolucion.value;
+      if(!usuario) return "Selecciona el usuario.";
+      if(!serie)   return "Selecciona el número de serie.";
+      if(!equipo)  return "No se pudo obtener el equipo (elige una serie válida).";
+      if(!fP)      return "Indica la fecha de préstamo.";
+      if(!fD)      return "Indica la fecha de devolución.";
+      if(fD < fP)  return "La fecha de devolución no puede ser anterior a la de préstamo.";
+      return "";
+    }
+
+    function agregarPrestamo(){
+      const err = validar();
+      if(err){ msgError.textContent = err; return; }
+
+      const prestamo = {
+        id: 'P'+Date.now(),
+        usuario: selUsuario.value,
+        equipoNombre: inpEquipo.value.trim(),
+        serie: selSerie.value,
+        fechaPrestamo: inpFechaPrestamo.value,
+        fechaDevolucion: inpFechaDevolucion.value,
+        estado: 'Activo'
+      };
+
+      prestamos.push(prestamo);
+      saveLS(LS_PRE, prestamos);
+      renderPrestamos();
+      toggleForm(false);
+    }
+
+    function devolverPrestamo(id){
+      const p = prestamos.find(x=>x.id===id);
+      if(!p || p.estado!=='Activo') return;
+      p.estado = 'Devuelto';
+      saveLS(LS_PRE, prestamos);
+      renderPrestamos();
+    }
+
+    // --- Eventos ---
+    btnNuevo.addEventListener('click', ()=> toggleForm(formPrestamo.classList.contains('hidden')));
+    btnCancelar.addEventListener('click', ()=> toggleForm(false));
+    btnAgregar.addEventListener('click', agregarPrestamo);
+    txtBuscar.addEventListener('input', renderPrestamos);
+    selSerie.addEventListener('change', ()=>{
+      const serieSel = selSerie.value;
+      inpEquipo.value = mapSerieToEquipo.get(serieSel) || '';
+    });
+
+    // --- Init ---
+    (async function init(){
+      try{
+        await Promise.all([cargarUsuarios(), cargarPerifericos()]);
+      }catch(e){
+        msgError.textContent = "Error cargando datos del servidor.";
+        console.error(e);
+      }
+      renderPrestamos();
+      inpFechaPrestamo.value = hoyISO();
+    })();
+  });
+  </script>
+</body>
+</html>

@@ -1,5 +1,6 @@
-/* Variables basadas en el estilo retro final */
+/* Variables basadas en el estilo retro final Y VARIABLES PARA EL MODAL */
 :root {
+    /* Variables originales de la tabla */
     --color-bg-dark: #376f37; 
     --color-bg-green: #376f37; 
     --color-text-light: #ffffff;
@@ -8,7 +9,15 @@
     --color-edit-icon-border: #f5f5f5; 
     --color-input-bg: #ffffff;
     --color-search-icon: #6c757d;
-    --color-pagination-current: #f7a14e; 
+    --color-pagination-current: #f7a14e;
+
+    /* === NUEVO: Variables necesarias para el estilo del modal === */
+    --primary-green-dark: #1f3b1f;
+    --primary-green-light: #2b4a2b;
+    --accent-green-button: #2b5a2b;
+    --accent-green-button-hover: #3a6d3a;
+    --text-dark: #333333;
+    --shadow-main: rgba(0, 0, 0, 0.15);
 }
 
 /* -----------------------------------
@@ -27,7 +36,6 @@ body {
 
 .container {
     width: 90%;
-    /* 💥 CAMBIO CLAVE: Aumentar ancho máximo para evitar scroll horizontal */
     max-width: 1200px; 
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
     border-radius: 0; 
@@ -121,17 +129,56 @@ body {
     color: #333;
 }
 
+/* ======================================================== */
+/* === INICIO: ESTILOS PARA EL MENÚ DESPLEGABLE (DROPDOWN) === */
+/* ======================================================== */
+
 .dropdown {
     width: 30%;
     max-width: 200px;
-    height: 40px;
+    height: 44px; /* Ajuste de altura para alinear con la búsqueda */
     background-color: var(--color-input-bg);
     border-radius: 4px;
-    border: 1px solid #ccc; 
-    position: relative;
+    border: none; /* Quitamos el borde por defecto */
+    position: relative; /* Necesario para posicionar la flecha */
     cursor: pointer;
     overflow: hidden;
 }
+
+/* Estilos para el elemento <select> dentro del div .dropdown */
+.dropdown select {
+    width: 100%;
+    height: 100%;
+    border: none;
+    outline: none;
+    background: transparent; /* Hacemos transparente el fondo del select */
+    color: #333; /* Color de texto oscuro para el fondo blanco */
+    font-weight: 700;
+    font-size: 1em;
+    padding: 0 15px; /* Espaciado interno para que el texto no se pegue */
+    cursor: pointer;
+
+    /* Oculta la apariencia nativa del navegador */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+/* Creamos nuestra propia flecha personalizada */
+.dropdown::after {
+    content: '\25BC'; /* Código del carácter de flecha hacia abajo ▼ */
+    font-size: 0.8em;
+    color: #555;
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    pointer-events: none; /* Permite que el clic atraviese la flecha y llegue al select */
+}
+
+/* ====================================================== */
+/* === FIN: ESTILOS PARA EL MENÚ DESPLEGABLE (DROPDOWN) === */
+/* ====================================================== */
 
 /* -----------------------------------
  * Contenedor de Scroll de la Tabla
@@ -139,7 +186,6 @@ body {
 .table-scroll-wrapper {
     max-height: 480px; 
     overflow-y: auto; 
-    /* Quitamos el overflow-x: hidden si lo tuviera, pero auto/scroll es lo importante */
     width: 100%; 
     margin-bottom: 10px; 
 }
@@ -154,27 +200,24 @@ body {
     border-radius: 10px;
 }
 
-
 /* -----------------------------------
  * Tabla (Estilo de filas y celdas)
  * ----------------------------------- */
 .assets-table {
     width: 100%;
     border-collapse: collapse;
-    table-layout: fixed; /* 💥 CLAVE: Fija el ancho de la tabla al contenedor */
+    table-layout: fixed;
 }
 
 .assets-table th, .assets-table td {
     padding: 15px 10px; 
     text-align: left;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
-    /* 💥 CAMBIO CLAVE: Permitir que el texto se ajuste si es necesario (para evitar scroll) */
     white-space: normal; 
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-/* Cabecera de la tabla */
 .assets-table thead {
     display: table-header-group; 
     position: sticky;
@@ -198,21 +241,17 @@ body {
     font-size: 0.95em;
 }
 
-/* Estilos de datos */
 .col-id { color: var(--color-text-faded); }
 .assets-table td:nth-child(2) { font-weight: 700; } 
 
-/* 💥 AJUSTE DE ANCHOS (Para un total del 100%) */
 .col-id { width: 10%; }
-.col-titulo { width: 22%; } /* Más espacio para el título */
+.col-titulo { width: 22%; }
 .col-categoria { width: 10%; }
 .col-procesador { width: 15%; } 
 .col-caracteristicas { width: 15%; } 
 .col-lote { width: 10%; }
-.col-editar { width: 8%; text-align: center; } /* Botón más compacto */
+.col-editar { width: 8%; text-align: center; }
 
-
-/* Botón de Editar (lápiz) */
 .edit-button {
     width: 25px; 
     height: 25px;
@@ -252,19 +291,136 @@ body {
     color: var(--color-text-light);
 }
 
-/* Si usas paginación */
-.page-button {
-    background-color: var(--color-input-bg);
-    color: var(--color-bg-green);
-    border: none;
-    border-radius: 4px;
-    padding: 8px 12px; 
-    font-size: 0.9em;
-    cursor: pointer;
-    font-weight: 700;
+
+/* ################################################################## */
+/* ##           ESTILOS PARA EL MODAL DE FORMULARIO                ## */
+/* ################################################################## */
+
+.modal {
+    display: none; /* Se activa con JS */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.55);
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    padding: 20px;
+    box-sizing: border-box;
+    overflow-y: auto;
 }
 
-.page-button.current {
-    background-color: var(--color-pagination-current); 
-    color: var(--color-text-light);
+.modal-content {
+    background: linear-gradient(135deg, var(--primary-green-light), var(--accent-green-button));
+    padding: 25px 35px;
+    border-radius: 20px;
+    box-shadow: 0 15px 50px rgba(0,0,0,0.35);
+    width: 800px;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    color: #fff;
+}
+
+.modal-content h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.8em;
+    color: #f0f4f2;
+    text-shadow: 1px 1px 5px rgba(0,0,0,0.5);
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px 25px;
+}
+
+.full-width {
+    grid-column: 1 / 3;
+}
+
+.modal-content label {
+    font-weight: 600;
+    margin-bottom: 4px;
+    display: block;
+    color: #f0f4f2;
+}
+
+.modal-content input,
+.modal-content textarea,
+.modal-content select { /* Añadido 'select' para unificar estilos */
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #2b4a2b;
+    font-size: 1em;
+    outline: none;
+    transition: all 0.3s ease;
+    background-color: rgba(255,255,255,0.95);
+    color: #333;
+    box-sizing: border-box;
+    font-family: 'Open Sans', sans-serif; /* Heredar fuente */
+}
+
+.modal-content textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+.form-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.form-buttons button {
+    padding: 10px 22px;
+    font-size: 1em;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* IDs para botones del modal de edición */
+#cancelarEditar {
+    background-color: #ccc;
+    color: #333;
+}
+
+#cancelarEditar:hover {
+    background-color: #999;
+    color: #fff;
+}
+
+#guardarCambios {
+    background-color: var(--accent-green-button);
+    color: #fff;
+}
+
+#guardarCambios:hover {
+    background-color: var(--accent-green-button-hover);
+    transform: scale(1.05);
+}
+
+/* Media Query para responsividad del modal */
+@media (max-width: 750px) {
+    .modal-content {
+        width: 100%;
+        padding: 20px;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .full-width {
+        grid-column: 1 / 2;
+    }
 }

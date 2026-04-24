@@ -1,0 +1,186 @@
+/* =====================================================
+   paginas.css — Layout compartido por páginas internas
+   Elimina ~80 líneas duplicadas entre style_inventario.css
+   y style_prest.css, y el layout de style_modificaractivo.css
+   ===================================================== */
+
+/* ── Reset y cuerpo ── */
+html, body { height: 100%; }
+body {
+    margin: 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px 16px;
+    background: #0f1f0f;
+}
+
+/* ── Tarjeta contenedora principal ── */
+.contenedor {
+    width: min(1100px, 100%);
+    border-radius: var(--radio-borde);
+    overflow: hidden;
+    box-shadow: 0 18px 44px var(--sombra-principal);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: saturate(110%) blur(1px);
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
+
+/* ── Encabezado ── */
+.encabezado {
+    background: linear-gradient(180deg, var(--verde-claro-primario), var(--verde-boton));
+    padding: 28px 28px 18px;
+    text-align: center;
+    position: relative;
+}
+.titulo-pagina {
+    margin: 0;
+    letter-spacing: 4px;
+    font-weight: 800;
+    font-size: clamp(22px, 3.2vw, 40px);
+    color: #a8d5a8;
+}
+
+/* ── Cuerpo / contenedor de inventario ── */
+.cuerpo-pagina {
+    background: linear-gradient(180deg, #214a26, var(--verde-claro-primario));
+    padding: 22px 24px 16px;
+    color: #fff;
+}
+
+/* ── Encabezado de lista (título + controles) ── */
+.encabezado-lista {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: end;
+    margin-bottom: 12px;
+}
+.titulo-lista {
+    margin: 0;
+    font-size: clamp(16px, 2vw, 22px);
+    font-weight: 800;
+}
+
+/* ── Barra de controles ── */
+.barra-controles {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* ── Tarjeta de formulario ── */
+.tarjeta-formulario {
+    background: var(--fondo-panel);
+    border-radius: 14px;
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    padding: 18px 16px;
+    margin: 10px 0 14px;
+    color: var(--texto-oscuro);
+}
+.tarjeta-formulario label {
+    font-weight: 800;
+    color: #214a26;
+    margin-bottom: 6px;
+    display: block;
+}
+.tarjeta-formulario input,
+.tarjeta-formulario select {
+    width: 100%;
+    padding: 12px 12px;
+    border-radius: 12px;
+    border: 1px solid #214a26;
+    background: #fff;
+    color: #222;
+    font-size: 15px;
+    outline: none;
+    font-family: var(--fuente-base);
+}
+
+/* ── Título de sección dentro de la página ── */
+.titulo-seccion {
+    margin: 18px 2px 6px;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    opacity: 0.95;
+}
+
+/* ── Columnas de tabla (anchos semánticos) ── */
+.col-id          { width: 10%; }
+.col-titulo      { width: 22%; }
+.col-categoria   { width: 10%; }
+.col-procesador  { width: 15%; }
+.col-caracteristicas { width: 15%; }
+.col-lote        { width: 10%; }
+.col-editar      { width: 8%; text-align: center; }
+.col-eliminar    { width: 110px; text-align: center; }
+
+/* ── Botón de edición en tabla ── */
+.boton-editar {
+    width: 25px;
+    height: 25px;
+    border-radius: 4px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+}
+.boton-editar::before {
+    content: "✏️";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 14px;
+    line-height: 1;
+}
+
+/* ── Ocultar elemento ── */
+.oculto { display: none; }
+
+/* ── Autocomplete ── */
+.autocompletar {
+    position: relative;
+    width: 100%;
+}
+.autocompletar input[type="text"] {
+    width: 100%;
+    box-sizing: border-box;
+}
+.items-autocompletar {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
+    max-height: 230px;
+    overflow-y: auto;
+    padding: 4px 0;
+}
+.items-autocompletar div {
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #222;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+.items-autocompletar div:hover { background: #f0f0f0; }
+
+/* ── Responsive ── */
+@media (max-width: 860px) {
+    .encabezado-lista  { grid-template-columns: 1fr; }
+    .barra-controles   { justify-content: stretch; }
+    .caja-busqueda     { min-width: 0; width: 100%; }
+    .formulario-cuadricula { grid-template-columns: 1fr; }
+    .tabla-activos td  { white-space: normal; }
+}

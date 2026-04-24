@@ -1,0 +1,311 @@
+/* =====================================================
+   componentes.css — Clases reutilizables compartidas
+   Elimina estilos inline duplicados en múltiples HTML
+   ===================================================== */
+
+/* ── Botón volver (circular) ──
+   Reemplaza el bloque de 15 líneas inline duplicado en 6 páginas HTML */
+.btn-volver {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background-color: var(--verde-700);
+    border: 2px solid var(--verde-300);
+    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    color: var(--verde-300);
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 0 8px rgba(124, 252, 144, 0.5);
+    transition: background-color 0.2s, transform 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+.btn-volver:hover {
+    background-color: var(--verde-500);
+    transform: scale(1.1);
+}
+
+/* ── Botón exportar Excel ──
+   Reemplaza 7 líneas inline duplicadas en 4 páginas HTML */
+.btn-exportar {
+    background: var(--verde-700);
+    color: var(--verde-300);
+    border: 2px solid var(--verde-300);
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    font-family: var(--fuente-base);
+    transition: background-color 0.2s;
+}
+.btn-exportar:hover { background: var(--verde-500); }
+
+/* ── Botón principal genérico ── */
+.btn-principal {
+    padding: 11px 18px;
+    border-radius: 12px;
+    border: 0;
+    font-weight: 800;
+    cursor: pointer;
+    background: var(--verde-boton);
+    color: #fff;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+    transition: transform 0.12s ease, background 0.2s ease;
+    font-family: var(--fuente-base);
+}
+.btn-principal:hover  { background: var(--verde-boton-hover); transform: translateY(-1px); }
+.btn-principal:active { transform: scale(0.98); }
+
+/* ── Botón eliminar (rojo) ── */
+.btn-eliminar {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    background: #9b2c2c;
+    color: #fff;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform 0.12s ease, opacity 0.2s ease;
+    font-family: var(--fuente-base);
+}
+.btn-eliminar:hover  { transform: translateY(-1px); opacity: 0.95; }
+.btn-eliminar:active { transform: scale(0.98); }
+.btn-eliminar[disabled] { opacity: 0.6; cursor: not-allowed; }
+
+/* ── Sistema de modales unificado ──
+   Reemplaza los 2 sistemas distintos que existían */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.55);
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    padding: 20px;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+.modal.abierto { display: flex; }
+
+.modal-contenido {
+    background: linear-gradient(135deg, var(--verde-claro-primario), var(--verde-boton));
+    padding: 25px 35px;
+    border-radius: 20px;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.35);
+    width: 800px;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    color: #fff;
+    position: relative;
+    overflow: visible;
+}
+
+.modal-contenido h2,
+.modal-contenido h3 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.8em;
+    color: #f0f4f2;
+    text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+}
+
+.modal-contenido label {
+    font-weight: 600;
+    margin-bottom: 4px;
+    display: block;
+    color: #f0f4f2;
+}
+
+.modal-contenido input,
+.modal-contenido textarea,
+.modal-contenido select {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--verde-800);
+    font-size: 1em;
+    outline: none;
+    transition: all 0.3s ease;
+    background-color: rgba(255, 255, 255, 0.95);
+    color: #333;
+    box-sizing: border-box;
+    font-family: var(--fuente-base);
+}
+
+.modal-contenido textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+/* ── Formularios compartidos ── */
+.formulario-cuadricula {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px 25px;
+}
+.ancho-completo { grid-column: 1 / 3; }
+
+.formulario-botones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.formulario-botones button {
+    padding: 10px 22px;
+    font-size: 1em;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    font-family: var(--fuente-base);
+}
+.formulario-botones button:first-child:not(:last-child) { background: #d9d9d9; color: #333; }
+.formulario-botones button:first-child:not(:last-child):hover { background: #aaa; color: #fff; }
+.formulario-botones button:last-child { background: var(--verde-boton); color: #fff; }
+.formulario-botones button:last-child:hover { background: var(--verde-boton-hover); transform: scale(1.05); }
+
+/* Compatibilidad con IDs legacy en modales existentes */
+#cancelar, #cancelarEditar, #cancelarAsignacion,
+#cancelarUsuario, #cancelarCambioRol {
+    background: #d9d9d9 !important;
+    color: #333 !important;
+}
+
+/* ── Tabla compartida por todas las páginas internas ── */
+.contenedor-tabla {
+    max-height: 480px;
+    overflow: auto;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(0, 0, 0, 0.06);
+    margin-top: 8px;
+}
+.contenedor-tabla::-webkit-scrollbar { width: 10px; height: 10px; }
+.contenedor-tabla::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.28); border-radius: 10px; }
+
+.tabla-activos {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    table-layout: fixed;
+}
+.tabla-activos thead {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: linear-gradient(180deg, #1e4222, #214a26);
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.15);
+}
+.tabla-activos th,
+.tabla-activos td {
+    padding: 14px 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.tabla-activos th { font-size: 0.92rem; font-weight: 800; color: #dfefdf; letter-spacing: 0.3px; }
+.tabla-activos tbody td { font-size: 0.97rem; color: #fff; }
+.tabla-activos tbody tr:nth-child(odd) { background: rgba(255, 255, 255, 0.03); }
+.tabla-activos tbody tr:hover { background: rgba(255, 255, 255, 0.08); transition: background 0.2s; }
+
+.celda-vacia { text-align: center !important; padding: 22px 12px !important; color: #dfefdf; }
+.pie-tabla { display: flex; justify-content: flex-end; padding: 12px 4px 6px; color: #dfefdf; font-size: 0.93rem; }
+
+/* ── Caja de búsqueda ── */
+.caja-busqueda {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #fff;
+    color: #333;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid #e7efe7;
+    min-width: min(360px, 72vw);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08) inset;
+}
+.caja-busqueda input {
+    border: 0;
+    outline: 0;
+    background: transparent;
+    font-size: 15px;
+    width: 100%;
+    color: #222;
+}
+.icono-busqueda { font-size: 18px; opacity: 0.65; }
+
+/* ── Mensajes de estado ── */
+.mensaje-exito { color: #2b5a2b; font-weight: 700; }
+.mensaje-error  { color: #9b2c2c; font-weight: 700; }
+
+/* ── Chips de estado (préstamos) ── */
+.chip {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 800;
+    color: #103310;
+    background: #cfead0;
+}
+.chip.vencido { color: #4d1f1f; background: #ffd4d4; }
+
+/* ── Dropdown (select con flecha custom) ── */
+.desplegable {
+    width: 30%;
+    max-width: 200px;
+    height: 44px;
+    background: #fff;
+    border-radius: 4px;
+    border: none;
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+}
+.desplegable select {
+    width: 100%;
+    height: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: #333;
+    font-weight: 700;
+    font-size: 1em;
+    padding: 0 15px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    cursor: pointer;
+}
+.desplegable::after {
+    content: '\25BC';
+    font-size: 0.8em;
+    color: #555;
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+/* ── Modal responsive ── */
+@media (max-width: 750px) {
+    .modal-contenido { width: 100%; padding: 20px; }
+    .formulario-cuadricula { grid-template-columns: 1fr; }
+    .ancho-completo { grid-column: 1 / 2; }
+}

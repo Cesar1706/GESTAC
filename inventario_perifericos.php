@@ -2,21 +2,21 @@
 // inventario_perifericos.php
 header('Content-Type: application/json; charset=utf-8');
 
-// (Opcional) CORS si lo necesitas
+// CORS opcional
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(204); exit; }
 
-// Errores (útil en desarrollo)
+// Errores (desarrollo)
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 $dbHost = 'localhost';
 $dbName = 'GESTAC';
-$dbUser = 'root';      // CAMBIA según tu entorno
-$dbPass = '';          // CAMBIA según tu entorno
+$dbUser = 'root';
+$dbPass = '';
 
 try {
     $pdo = new PDO(
@@ -42,8 +42,76 @@ $method = $_SERVER['REQUEST_METHOD'];
 $action = $_GET['action'] ?? $_POST['action'] ?? 'list';
 
 try {
+
+    // ================= EXPORTAR EXCEL =================
+    if ($method === 'GET' && $action === 'export_excel') {
+
+        header("Content-Type: application/vnd.ms-excel; charset=UTF-8");
+        header("Content-Disposition: attachment; filename=inventario_perifericos.xls");
+        header("Pragma: no-cache");
+        header("Expires: 0");
+
+        echo '
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <style>
+                table {
+                    border-collapse: collapse;
+                    width: 100%;
+                    font-family: Arial;
+                }
+                th {
+                    background-color: #2f6b2f;
+                    color: white;
+                    padding: 8px;
+                    border: 1px solid black;
+                    text-align: center;
+                }
+                td {
+                    border: 1px solid black;
+                    padding: 6px;
+                }
+                tr:nth-child(even) {
+                    background-color: #e6ffe6;
+                }
+                .titulo {
+                    font-size: 18px;
+                    font-weight: bold;
+                    text-align: center;
+                    margin-bottom: 10px;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="titulo">REPORTE INVENTARIO DE PERIFÉRICOS</div>
+            <table>
+                <tr>
+                    <th>Nombre</th>
+                    <th>S/N</th>
+                </tr>
+        ';
+
+        $sql = "SELECT `nombre`, `S/N` AS sn FROM `inventario_perifericos` ORDER BY `nombre`";
+        $stmt = $pdo->query($sql);
+
+        while ($row = $stmt->fetch()) {
+            echo "<tr>
+                    <td>{$row['nombre']}</td>
+                    <td>{$row['sn']}</td>
+                  </tr>";
+        }
+
+        echo '
+            </table>
+        </body>
+        </html>';
+
+        exit;
+    }
+
+    // ================= LISTAR =================
     if ($method === 'GET' && $action === 'list') {
-        // Traer id + columnas visibles (S/N la aliaso como sn)
         $sql = "SELECT `id`, `nombre`, `S/N` AS sn
                 FROM `inventario_perifericos`
                 ORDER BY `nombre` ASC";
@@ -53,12 +121,12 @@ try {
         exit;
     }
 
+    // ================= INSERTAR =================
     if ($method === 'POST' && $action === 'insert') {
         $nombre = trim($_POST['nombre'] ?? '');
         $sn     = trim($_POST['sn'] ?? '');
 
         if ($nombre === '' || $sn === '') {
-            http_response_code(400);
             echo json_encode(['success' => false, 'message' => 'Faltan campos obligatorios.'], JSON_UNESCAPED_UNICODE);
             exit;
         }
@@ -71,10 +139,10 @@ try {
         exit;
     }
 
+    // ================= ELIMINAR =================
     if ($method === 'POST' && $action === 'delete') {
         $id = intval($_POST['id'] ?? 0);
         if ($id <= 0) {
-            http_response_code(400);
             echo json_encode(['success' => false, 'message' => 'ID inválido.'], JSON_UNESCAPED_UNICODE);
             exit;
         }
@@ -87,7 +155,6 @@ try {
         exit;
     }
 
-    http_response_code(400);
     echo json_encode(['success' => false, 'message' => 'Acción no soportada.'], JSON_UNESCAPED_UNICODE);
 
 } catch (Throwable $e) {

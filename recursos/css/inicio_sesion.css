@@ -1,0 +1,196 @@
+/* =====================================================
+   inicio_sesion.css — Estilos específicos del login
+   Requiere: base.css cargado antes
+   ===================================================== */
+
+/* Variables propias del login (colores del panel izquierdo) */
+:root {
+    --login-verde-panel-izq: #2b442d;
+    --login-verde-panel-izq-grad: #282e28;
+    --login-fondo-input: #e0e0e0;
+    --login-color-enlace: #1976d2;
+    --login-color-enlace-hover: #1565c0;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: #37cf5d;
+}
+
+/* ── Contenedor del panel split ── */
+.contenedor-login {
+    display: flex;
+    width: 900px;
+    max-width: 90%;
+    height: 550px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    border-radius: 12px;
+    overflow: hidden;
+    background: #fff;
+}
+
+/* ── Panel izquierdo (decorativo) ── */
+.panel-izquierdo {
+    flex: 1.2;
+    background: linear-gradient(135deg, var(--login-verde-panel-izq), var(--login-verde-panel-izq-grad));
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+.panel-izquierdo::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background:
+        radial-gradient(circle at 10% 10%, rgba(255,255,255,0.05) 1px, transparent 1px),
+        radial-gradient(circle at 90% 90%, rgba(255,255,255,0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+    opacity: 0.8;
+}
+
+/* ── Panel derecho (formulario) ── */
+.panel-derecho {
+    flex: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 30px;
+    box-sizing: border-box;
+}
+
+/* ── Caja del formulario ── */
+.caja-formulario {
+    text-align: center;
+    width: 100%;
+    max-width: 350px;
+}
+
+/* ── Icono de usuario ── */
+.icono-usuario { margin-bottom: 25px; }
+.icono-usuario img {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    border: 3px solid var(--texto-oscuro);
+    padding: 8px;
+    box-sizing: border-box;
+}
+
+/* ── Títulos ── */
+h1 {
+    font-size: 1.8em;
+    color: var(--texto-oscuro);
+    margin-bottom: 30px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+#GESTAC {
+    color: rgba(168, 168, 168, 0.678);
+    font-size: 40px;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* ── Etiquetas ── */
+label {
+    display: block;
+    text-align: left;
+    margin-bottom: 8px;
+    font-size: 0.9em;
+    color: var(--texto-oscuro);
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ── Campos de entrada ── */
+.campo-entrada {
+    width: calc(100% - 24px);
+    padding: 12px;
+    margin-bottom: 25px;
+    border: none;
+    border-radius: 8px;
+    background: var(--login-fondo-input);
+    font-size: 1em;
+    color: var(--texto-oscuro);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    font-family: var(--fuente-base);
+}
+.campo-entrada::placeholder {
+    color: var(--texto-secundario);
+    font-style: italic;
+}
+.campo-entrada:focus {
+    outline: none;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.3), inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* ── Botón de login ── */
+.boton-login {
+    width: 100%;
+    padding: 14px 20px;
+    background: var(--verde-400);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1em;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-family: var(--fuente-base);
+}
+.boton-login:hover {
+    background: var(--verde-boton-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* ── Enlace de contraseña ── */
+.enlace-contrasena, .enlace-volver-login {
+    margin-top: 25px;
+    font-size: 0.9em;
+}
+.enlace-contrasena a, .enlace-volver-login a {
+    color: var(--login-color-enlace);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+.enlace-contrasena a:hover, .enlace-volver-login a:hover {
+    color: var(--login-color-enlace-hover);
+    text-decoration: underline;
+}
+
+/* ── Mensaje de error ── */
+.mensaje-error-login {
+    color: red;
+    font-weight: bold;
+    background: #ffd6d6;
+    border: 1px solid red;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+/* ── Texto de instrucciones ── */
+.texto-instruccion {
+    font-size: 0.9em;
+    color: var(--texto-secundario);
+    margin-bottom: 25px;
+    line-height: 1.5;
+}

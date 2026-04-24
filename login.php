@@ -24,8 +24,9 @@ if(isset($_POST['action']) && $_POST['action'] === 'update_password'){
     $checkResult = $checkStmt->get_result();
 
     if($checkResult->num_rows > 0){
+        $hashedPass = password_hash($newpass, PASSWORD_DEFAULT);
         $updateStmt = $conn->prepare("UPDATE users SET password=? WHERE username=?");
-        $updateStmt->bind_param("ss", $newpass, $userUpdate);
+        $updateStmt->bind_param("ss", $hashedPass, $userUpdate);
         if($updateStmt->execute()){
             echo json_encode(["success"=>true,"message"=>"✅ Contraseña actualizada correctamente"]);
         } else {
@@ -51,7 +52,7 @@ $result = $stmt->get_result();
 
 if($result->num_rows > 0){
     $row = $result->fetch_assoc();
-    if($pass === $row['password']){
+    if(password_verify($pass, $row['password'])){
         echo json_encode(["success"=>true,"rol"=>$row['rol']]);
     } else {
         echo json_encode(["success"=>false,"message"=>"❌ Usuario o contraseña incorrectos"]);

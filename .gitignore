@@ -1,0 +1,13 @@
+# Dependencias de Composer (se regeneran con `composer install`)
+/vendor/
+
+# Datos internos de Claude Code
+/.claude/
+
+# Archivos de IDE / sistema
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.vscode/
+.idea/

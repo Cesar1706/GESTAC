@@ -1,0 +1,60 @@
+/* =====================================================
+   base.css — Fuente única de verdad de variables y reset
+   Todos los otros CSS de este proyecto importan este archivo
+   ===================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700;800&display=swap');
+
+:root {
+    /* ── Paleta de verdes ── */
+    --verde-900: #1f3b1f;
+    --verde-800: #2b4a2b;
+    --verde-700: #2b5a2b;
+    --verde-600: #376f37;
+    --verde-500: #3a6d3a;
+    --verde-400: #4CAF50;
+    --verde-300: #7CFC90;
+    --verde-200: #a8d5a8;
+    --verde-100: #d9ead3;
+
+    /* ── Alias semánticos ── */
+    --verde-oscuro-primario:    var(--verde-900);
+    --verde-claro-primario:     var(--verde-800);
+    --verde-boton:              var(--verde-700);
+    --verde-boton-hover:        var(--verde-500);
+
+    /* ── Texto ── */
+    --texto-oscuro:             #333333;
+    --texto-secundario:         #777777;   /* sobre fondo blanco/claro */
+    --texto-sobre-verde:        #d9ead3;   /* sobre fondo verde oscuro */
+    --texto-acento:             var(--verde-300);
+
+    /* ── Superficies ── */
+    --fondo-panel:              #fdfdfd;
+    --sombra-principal:         rgba(0, 0, 0, 0.35);
+    --radio-borde:              16px;
+    --radio-borde-sm:           8px;
+
+    /* ── Tipografía ── */
+    --fuente-base: 'Open Sans', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif;
+}
+
+/* ── Reset mínimo ── */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--fuente-base);
+    color: var(--texto-oscuro);
+}
+
+img {
+    max-width: 100%;
+    display: block;
+}

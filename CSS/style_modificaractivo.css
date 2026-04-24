@@ -424,3 +424,37 @@ body {
         grid-column: 1 / 2;
     }
 }
+
+.header {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+}
+
+.header .btn-back {
+    justify-self: start;
+    margin-left: 20px;
+}
+
+.header .title {
+    text-align: center;
+}
+
+
+
+.btn-back {
+    position: absolute;
+    left: 20px;
+    background: transparent;
+    border: none;
+    color: #ffffff;
+    font-size: 26px;
+    cursor: pointer;
+}
+
+.btn-back:hover {
+    color: #c8ffc8;
+    transform: scale(1.1);
+}
+
+

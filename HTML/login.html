@@ -3,70 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar Sesión</title>
-    <link rel="stylesheet" href="../CSS/style_login.css">
+    <title>Iniciar Sesión — GESTAC</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../recursos/css/base.css">
+    <link rel="stylesheet" href="../recursos/css/inicio_sesion.css">
 </head>
 <body style="background-image: url('../IMG/fondo.png'); background-repeat: no-repeat; background-size: cover; background-position: center;">
-    <div class="login-page-container">
-        <div class="left-panel">
+    <div class="contenedor-login">
+        <div class="panel-izquierdo">
             <h1 id="GESTAC">GESTAC</h1>
         </div>
 
-        <div class="right-panel">
-            <div class="form-box">
-                <div class="user-icon">
+        <div class="panel-derecho">
+            <div class="caja-formulario">
+                <div class="icono-usuario">
                     <img src="https://cdn-icons-png.flaticon.com/512/3237/3237472.png" alt="Icono de Usuario">
                 </div>
 
                 <h1>INICIAR SESIÓN</h1>
 
-                <!-- Aquí se mostrarán mensajes de error -->
-                <div id="error-message"></div>
+                <div id="mensajeError"></div>
 
-                <form id="loginForm">
-                    <label for="usuario_login">USUARIO</label>
-                    <input type="text" id="usuario_login" name="usuario" class="input-field" placeholder="Ingresa tu usuario" required>
+                <form id="formularioLogin">
+                    <label for="campoUsuario">USUARIO</label>
+                    <input type="text" id="campoUsuario" name="usuario" class="campo-entrada" placeholder="Ingresa tu usuario" required>
 
-                    <label for="password_login">CONTRASEÑA</label>
-                    <input type="password" id="password_login" name="password" class="input-field" placeholder="Ingresa tu contraseña" required>
+                    <label for="campoContrasena">CONTRASEÑA</label>
+                    <input type="password" id="campoContrasena" name="password" class="campo-entrada" placeholder="Ingresa tu contraseña" required>
 
-                    <button type="submit" class="login-button">ENTRAR</button>
+                    <button type="submit" class="boton-login">ENTRAR</button>
                 </form>
 
-                <p class="link-forgot-password"><a href="cambiar_contraseña.html">¿Has olvidado tu contraseña?</a></p>
+                <p class="enlace-contrasena"><a href="cambiar_contraseña.html">¿Has olvidado tu contraseña?</a></p>
             </div>
         </div>
     </div>
 
     <script>
-document.getElementById("loginForm").addEventListener("submit", function(e){
-    e.preventDefault();
+    document.getElementById('formularioLogin').addEventListener('submit', function (e) {
+        e.preventDefault();
+        const usuario    = document.getElementById('campoUsuario').value.trim();
+        const contrasena = document.getElementById('campoContrasena').value.trim();
+        const divError   = document.getElementById('mensajeError');
 
-    const usuario = document.getElementById("usuario_login").value.trim();
-    const password = document.getElementById("password_login").value.trim();
-    const errorDiv = document.getElementById("error-message");
-
-    fetch("../login.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `usuario=${encodeURIComponent(usuario)}&password=${encodeURIComponent(password)}`
-    })
-    .then(response => response.json())
-    .then(data => {
-        if(data.success){
-            if(data.rol === "admin"){
-                window.location.href = "menu_admin.html";
+        fetch('../servicios/autenticacion.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `usuario=${encodeURIComponent(usuario)}&password=${encodeURIComponent(contrasena)}`
+        })
+        .then(r => r.json())
+        .then(datos => {
+            if (datos.exito) {
+                window.location.href = datos.rol === 'admin' ? 'menu_admin.html' : 'menu_user.html';
             } else {
-                window.location.href = "menu_user.html";
+                divError.innerHTML = `<p class="mensaje-error-login">${datos.mensaje}</p>`;
             }
-        } else {
-            errorDiv.innerHTML = `<p class="error-message">${data.message}</p>`;
-        }
-    })
-    .catch(err => console.error("Error:", err));
-});
-</script>
-
-
+        })
+        .catch(err => console.error('Error:', err));
+    });
+    </script>
 </body>
 </html>

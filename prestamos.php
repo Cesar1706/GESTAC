@@ -1,11 +1,15 @@
 <?php
-// prestamos.php — TODO EN UNO: conexión + consultas + render
+// data_prestamos.php — Conecta a GESTAC y emite JS con datos para el HTML (autodetección)
+// Accede a este archivo directo en el navegador para verificar: http://localhost/tu-ruta/data_prestamos.php
 
-/* ======================= CONEXIÓN A BD ======================= */
+header('Content-Type: application/javascript; charset=utf-8');
+
 $DB_HOST = 'localhost';
 $DB_NAME = 'GESTAC';
 $DB_USER = 'root';
-$DB_PASS = ''; // cambia según tu entorno
+$DB_PASS = ''; // cambia si tu root tiene contraseña
+
+function js_echo($code){ echo $code, "\n"; }
 
 try {
   $pdo = new PDO(
@@ -19,38 +23,94 @@ try {
     ]
   );
 } catch (Throwable $e) {
-  http_response_code(500);
-  die("<pre style='color:#c00;font:14px/1.4 monospace'>Error de conexión: ".htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8')."</pre>");
+  js_echo("console.error('DB connect error:', ".json_encode($e->getMessage()).");");
+  js_echo("window.PREST_DATA = { usuarios: [], perifericos: [], error: ".json_encode($e->getMessage())." };");
+  exit;
 }
 
-/* ======================= CONSULTAS ======================= */
-try {
-  // Usuarios
-  $usuarios = [];
-  $stmt = $pdo->query("SELECT nombre FROM usuarios WHERE nombre IS NOT NULL AND nombre<>'' ORDER BY nombre ASC");
-  foreach ($stmt as $r) { $usuarios[] = $r['nombre']; }
+/* ---------- utilidades ---------- */
+function table_exists(PDO $pdo, $table){
+  try {
+    $stmt = $pdo->query("SHOW TABLES LIKE ".$pdo->quote($table));
+    return (bool)$stmt->fetchColumn();
+  } catch (Throwable $e) { return false; }
+}
+function column_exists(PDO $pdo, $table, $column){
+  try {
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = :t AND COLUMN_NAME = :c");
+    $stmt->execute([':t'=>$table, ':c'=>$column]);
+    return $stmt->fetchColumn() > 0;
+  } catch (Throwable $e) { return false; }
+}
 
-  // Periféricos: columna `S/N` -> alias sn
-  $perifs = [];
-  $stmt = $pdo->query("
-    SELECT nombre, `S/N` AS sn
-    FROM inventario_perifericos
-    WHERE nombre IS NOT NULL AND nombre <> ''
-      AND `S/N` IS NOT NULL AND `S/N` <> ''
-    ORDER BY nombre ASC, sn ASC
-  ");
-  foreach ($stmt as $r) {
-    $perifs[] = ['nombre' => $r['nombre'], 'sn' => (string)$r['sn']];
+/* ---------- detectar tablas ---------- */
+$tblUsersCandidates = ['usuarios', 'user', 'users'];
+$tblInvCandidates   = ['inventario_perifericos', 'inventario_periferico', 'perifericos', 'inventario'];
+
+$tblUsers = null;
+foreach ($tblUsersCandidates as $t) { if (table_exists($pdo, $t)) { $tblUsers = $t; break; } }
+$tblInv   = null;
+foreach ($tblInvCandidates as $t) { if (table_exists($pdo, $t)) { $tblInv = $t; break; } }
+
+/* ---------- consultar usuarios.nombre ---------- */
+$usuarios = [];
+$warn = [];
+
+if ($tblUsers) {
+  // detectar columna de nombre
+  $nameCols = ['nombre','name','usuario'];
+  $nameCol = null;
+  foreach ($nameCols as $c) { if (column_exists($pdo, $tblUsers, $c)) { $nameCol = $c; break; } }
+  if ($nameCol === null) {
+    $warn[] = "No se encontró columna de nombre en tabla $tblUsers (probé: ".implode(',',$nameCols).")";
+  } else {
+    try {
+      $sql = "SELECT `$nameCol` AS nombre FROM `$tblUsers` WHERE `$nameCol` IS NOT NULL AND `$nameCol`<>'' ORDER BY `$nameCol` ASC";
+      $stmt = $pdo->query($sql);
+      foreach ($stmt as $r) { $usuarios[] = $r['nombre']; }
+    } catch (Throwable $e) {
+      $warn[] = "Error consultando usuarios: ".$e->getMessage();
+    }
   }
-} catch (Throwable $e) {
-  http_response_code(500);
-  die("<pre style='color:#c00;font:14px/1.4 monospace'>Error de consulta: ".htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8')."</pre>");
+} else {
+  $warn[] = "No se encontró ninguna tabla de usuarios (probé: ".implode(', ',$tblUsersCandidates).")";
 }
 
-/* ======================= HELPERS ======================= */
-function h($s){ return htmlspecialchars($s ?? '', ENT_QUOTES, 'UTF-8'); }
+/* ---------- consultar inventario: nombre + serie ---------- */
+$perifericos = [];
+if ($tblInv) {
+  // detectar columnas
+  $nameCols  = ['nombre','equipo','descripcion','nombre_equipo'];
+  $serieCols = ['S/N','S_N','serie','serial','no_serie','sn'];
+  $nameCol = null; $serieCol = null;
 
-// Mapa serie -> equipo para JS
-$serieToEquipo = [];
-foreach ($perifs as $p) { $serieToEquipo[$p['sn']] = $p['nombre']; }
-?>
+  foreach ($nameCols as $c)  { if (column_exists($pdo, $tblInv, $c))  { $nameCol = $c; break; } }
+  foreach ($serieCols as $c) { if (column_exists($pdo, $tblInv, $c)) { $serieCol = $c; break; } }
+
+  if ($nameCol === null)  { $warn[] = "No se encontró columna de nombre en $tblInv (probé: ".implode(',',$nameCols).")"; }
+  if ($serieCol === null) { $warn[] = "No se encontró columna de serie en $tblInv (probé: ".implode(',',$serieCols).")"; }
+
+  if ($nameCol && $serieCol) {
+    try {
+      $sql = "SELECT `$nameCol` AS nombre, `$serieCol` AS sn
+              FROM `$tblInv`
+              WHERE `$nameCol` IS NOT NULL AND `$nameCol`<>'' AND `$serieCol` IS NOT NULL AND `$serieCol`<>'' 
+              ORDER BY `$nameCol` ASC, `$serieCol` ASC";
+      $stmt = $pdo->query($sql);
+      foreach ($stmt as $r) {
+        $perifericos[] = ['nombre'=>$r['nombre'], 'sn'=>(string)$r['sn']];
+      }
+    } catch (Throwable $e) {
+      $warn[] = "Error consultando inventario: ".$e->getMessage();
+    }
+  }
+} else {
+  $warn[] = "No se encontró ninguna tabla de inventario (probé: ".implode(', ',$tblInvCandidates).")";
+}
+
+/* ---------- salida ---------- */
+js_echo("window.PREST_DATA = ".json_encode(['usuarios'=>$usuarios,'perifericos'=>$perifericos], JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES).";");
+js_echo("console.log('PREST_DATA counts',{usuarios: ".count($usuarios).", perifericos: ".count($perifericos)."});");
+if (!empty($warn)) {
+  js_echo("console.warn('PREST_DATA warnings:', ".json_encode($warn, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES).");");
+}

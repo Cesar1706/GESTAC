@@ -3,236 +3,247 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menú Principal</title>
-    <link rel="stylesheet" href="../CSS/style_menu.css">
-    <style>
-        /* ===================== Hover para custom-select ===================== */
-        .custom-select:hover .select-items {
-            display: block !important;
-        }
-
-        .custom-select:hover .select-selected {
-            border-color: #888; /* opcional para resaltar */
-        }
-    </style>
+    <title>Menú Principal — GESTAC Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../recursos/css/base.css">
+    <link rel="stylesheet" href="../recursos/css/componentes.css">
+    <link rel="stylesheet" href="../recursos/css/menu.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 
 <body style="background-image: url('../IMG/fondo.png'); background-repeat: no-repeat; background-size: cover; background-position: center;">
-    <div class="menu-container">
-        <div class="left-panel">
-            <h1 id="GESTAC">GESTAC</h1>
+
+    <!-- ===================== MODAL LOGS ===================== -->
+    <div id="modalLogs" class="modal">
+        <div class="modal-contenido modal-logs">
+            <h2>Historial de Cambios (Logs)</h2>
+            <div class="contenedor-logs">
+                <table id="tablaLogs">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Tipo</th>
+                            <th>Acción</th>
+                            <th>Registro</th>
+                            <th>Descripción</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div class="formulario-botones">
+                <button id="cerrarLogs">Cerrar</button>
+            </div>
         </div>
-        <div class="right-panel">
-            <div class="modules-grid">
-                <!-- ====================== ACTIVO ====================== -->
-                <div class="module-card has-submenu">
-                    <img src="../IMG/activos.png" alt="Activos" class="module-img">
-                    <span class="module-text">ACTIVOS</span>
-                    <div class="submenu left-submenu">
+    </div>
+
+    <div class="contenedor-menu">
+        <div class="panel-izquierdo">
+            <h1 id="GESTAC">GESTAC</h1>
+            <div class="contenedor-dona">
+                <canvas id="chartCategorias"></canvas>
+                <div id="counterDash" class="tablero-contadores">
+                    <div class="tarjeta-contador">
+                        <span class="numero-contador" id="cntActivos">0</span>
+                        <span class="etiqueta-contador">Activos</span>
+                    </div>
+                    <div class="tarjeta-contador">
+                        <span class="numero-contador" id="cntUsuarios">0</span>
+                        <span class="etiqueta-contador">Usuarios</span>
+                    </div>
+                    <div class="tarjeta-contador">
+                        <span class="numero-contador" id="cntPrestamos">0</span>
+                        <span class="etiqueta-contador">Préstamos</span>
+                    </div>
+                </div>
+            </div>
+            <div class="nav-tablero">
+                <button class="flecha-tablero" id="dashPrev">&#8249;</button>
+                <p class="etiqueta-dona" id="dashLabel">ACTIVOS POR CATEGORÍA</p>
+                <button class="flecha-tablero" id="dashNext">&#8250;</button>
+            </div>
+        </div>
+
+        <div class="panel-derecho">
+            <div class="cuadricula-modulos">
+                <!-- ACTIVOS -->
+                <div class="tarjeta-modulo tiene-submenu">
+                    <img src="../IMG/activos.png" alt="Activos" class="imagen-modulo">
+                    <span class="texto-modulo">ACTIVOS</span>
+                    <div class="submenu submenu-izquierdo">
                         <a href="#" id="btnNuevoActivo">NUEVO ACTIVO</a>
-                        <a href="modificar_activo.html">MODIFICAR ACTIVO</a> 
+                        <a href="modificar_activo.html">MODIFICAR ACTIVO</a>
                         <a href="ver_activo.html">VER ACTIVO</a>
                     </div>
                 </div>
 
-                <!-- ====================== ASIGNAR ====================== -->
-                <div class="module-card has-submenu">
-                    <img src="../IMG/asignar.png" alt="Asignar" class="module-img">
-                    <span class="module-text">ASIGNAR</span>
-                    <div class="submenu right-submenu">
+                <!-- ASIGNAR -->
+                <div class="tarjeta-modulo tiene-submenu">
+                    <img src="../IMG/asignar.png" alt="Asignar" class="imagen-modulo">
+                    <span class="texto-modulo">ASIGNAR</span>
+                    <div class="submenu submenu-derecho">
                         <a href="#" id="btnAsignarActivo">ASIGNAR ACTIVOS</a>
-                        <a href="modificar_asignado.html">MODIFICAR ASIGNADO</a> 
+                        <a href="modificar_asignado.html">MODIFICAR ASIGNADO</a>
                         <a href="ver_asignado.html">VER USUARIO</a>
                     </div>
                 </div>
 
-                <!-- ====================== OTROS ====================== -->
-                <a href="inventario.html" class="module-card">
-                    <img src="../IMG/perifericos.png" alt="Periféricos" class="module-img">
-                    <span class="module-text">INVENTARIO PERIFÉRICOS</span>
+                <!-- INVENTARIO -->
+                <a href="inventario.html" class="tarjeta-modulo">
+                    <img src="../IMG/perifericos.png" alt="Periféricos" class="imagen-modulo">
+                    <span class="texto-modulo">INVENTARIO PERIFÉRICOS</span>
                 </a>
 
-                <a href="prestamo.html" class="module-card">
-                    <img src="../IMG/prestamos.png" alt="Préstamos" class="module-img">
-                    <span class="module-text">ESPECIALES PRÉSTAMOS</span>
+                <!-- PRÉSTAMOS -->
+                <a href="prestamo.html" class="tarjeta-modulo">
+                    <img src="../IMG/prestamos.png" alt="Préstamos" class="imagen-modulo">
+                    <span class="texto-modulo">ESPECIALES PRÉSTAMOS</span>
                 </a>
             </div>
         </div>
     </div>
 
     <!-- ================= CONFIGURACIONES ================= -->
-    <div class="config-container">
-        <a href="#" class="config-icon" id="configIcon" title="Configuraciones">⚙️</a>
-        <div class="config-menu" id="configMenu">
-            <div class="config-item has-submenu">
-                <span id="usuariosMenu">Usuarios ▸</span>
-                <div class="submenu-config" id="submenuUsuarios">
-                    <a href="#" id="btnVerUsuarios">Ver Usuarios</a>
-                    <a href="#" id="btnAgregarUsuario">Agregar Usuario</a>
-                </div>
+    <a href="#" class="icono-config" id="configIcon" title="Configuraciones">⚙️</a>
+    <div class="menu-config" id="configMenu">
+        <div class="tiene-submenu">
+            <span id="usuariosMenu">Usuarios ▸</span>
+            <div class="submenu-config" id="submenuUsuarios">
+                <a href="#" id="btnVerUsuarios">Ver Usuarios</a>
+                <a href="#" id="btnAgregarUsuario">Agregar Usuario</a>
             </div>
-            <a href="login.html">Cerrar Sesión</a>
         </div>
+        <a id="btnLogs" href="#">Logs</a>
+        <a href="login.html">Cerrar Sesión</a>
     </div>
 
-    <div class="user-legend">Usuario: <span id="user-type">ADMIN</span></div>
+    <div class="leyenda-usuario">Usuario: <span id="user-type">ADMIN</span></div>
 
-    <!-- =========================================================
-         MODAL NUEVO ACTIVO
-    ========================================================= -->
+    <!-- ========== MODAL NUEVO ACTIVO ========== -->
     <div id="modalNuevoActivo" class="modal">
-        <div class="modal-content">
+        <div class="modal-contenido">
             <h2>Nuevo Activo</h2>
-            <form id="formNuevoActivo" method="POST" action="../menu.php">
-                <div class="form-grid">
+            <form id="formNuevoActivo" method="POST">
+                <div class="formulario-cuadricula">
                     <div>
                         <label>Categoría de activo</label>
-                        <div class="custom-select">
+                        <div class="selector-personalizado">
                             <input type="hidden" name="categoria">
-                            <span class="select-selected">Seleccionar</span>
-                            <div class="select-items select-hide">
+                            <span class="opcion-seleccionada">Seleccionar</span>
+                            <div class="lista-opciones">
                                 <div>Laptop</div>
                                 <div>PC</div>
                                 <div>All in one</div>
                             </div>
                         </div>
                     </div>
-
                     <div>
                         <label>Cantidad</label>
-                        <div class="custom-select" id="cantidadSelect">
+                        <div class="selector-personalizado" id="selectorCantidad">
                             <input type="hidden" name="cantidad">
-                            <span class="select-selected">Seleccionar</span>
-                            <div class="select-items select-hide">
-                                <div>1</div>
-                                <div>2</div>
-                                <div>3</div>
-                                <div>4</div>
-                                <div>5</div>
+                            <span class="opcion-seleccionada">Seleccionar</span>
+                            <div class="lista-opciones">
+                                <div>1</div><div>2</div><div>3</div><div>4</div><div>5</div>
                             </div>
                         </div>
                     </div>
-
-                    <div id="serieContainer" class="full-width"></div>
-
-                    <div class="full-width">
+                    <div id="serieContainer" class="ancho-completo"></div>
+                    <div class="ancho-completo">
                         <label>Número de Lote</label>
                         <input type="text" name="lote" placeholder="Ej. LOTE-2025-01">
                     </div>
-
                     <div>
                         <label>Nombre del producto</label>
                         <input type="text" name="nombre">
                     </div>
-                    <div class="full-width">
+                    <div class="ancho-completo">
                         <label>Descripción del activo</label>
                         <textarea name="descripcion"></textarea>
                     </div>
-                    <div>
-                        <label>Marca</label>
-                        <input type="text" name="marca">
-                    </div>
-                    <div>
-                        <label>Procesador</label>
-                        <input type="text" name="procesador">
-                    </div>
-                    <div>
-                        <label>Almacenamiento</label>
-                        <input type="text" name="almacenamiento">
-                    </div>
-                    <div>
-                        <label>RAM</label>
-                        <input type="text" name="ram">
-                    </div>
+                    <div><label>Marca</label><input type="text" name="marca"></div>
+                    <div><label>Procesador</label><input type="text" name="procesador"></div>
+                    <div><label>Almacenamiento</label><input type="text" name="almacenamiento"></div>
+                    <div><label>RAM</label><input type="text" name="ram"></div>
                 </div>
-                <div class="form-buttons">
+                <div class="formulario-botones">
                     <button type="button" id="cancelar">Cancelar</button>
-                    <button type="submit" id="guardar">Guardar Activo</button>
+                    <button type="button" id="guardarNuevoActivo">Guardar Activo</button>
                 </div>
+                <div id="mensajeNuevoActivo" style="margin-top:10px;font-weight:bold;text-align:center;"></div>
             </form>
         </div>
     </div>
 
-    <!-- =========================================================
-         MODAL ASIGNAR ACTIVO
-    ========================================================= -->
+    <!-- ========== MODAL ASIGNAR ACTIVO ========== -->
     <div id="modalAsignarActivo" class="modal">
-        <div class="modal-content">
+        <div class="modal-contenido">
             <h2>Asignar Activo</h2>
-            <form id="formAsignarActivo" method="POST" action="../menu.php">
-                <div class="form-grid">
-                    <div class="autocomplete">
+            <form id="formAsignarActivo" method="POST">
+                <div class="formulario-cuadricula">
+                    <div class="autocompletar">
                         <label>Usuario</label>
                         <input type="text" id="usuario" name="usuario" placeholder="Buscar usuario..." autocomplete="off">
-                        <div class="autocomplete-items" id="usuarioList"></div>
+                        <div class="items-autocompletar" id="usuarioList"></div>
                     </div>
-
-                    <div class="autocomplete">
+                    <div class="autocompletar">
                         <label>Activo</label>
                         <input type="text" id="activo" name="activo" placeholder="Buscar activo..." autocomplete="off">
-                        <div class="autocomplete-items" id="activoList"></div>
+                        <div class="items-autocompletar" id="activoList"></div>
                     </div>
-
-                    <div>
+                    <div class="ancho-completo">
                         <label>Fecha de Asignación</label>
                         <input type="date" name="fecha_asignacion" required>
                     </div>
                 </div>
-
-                <div class="form-buttons">
+                <div class="formulario-botones">
                     <button type="button" id="cancelarAsignacion">Cancelar</button>
                     <button type="button" id="guardarAsignacion">Guardar Asignación</button>
                 </div>
-
-                <div id="mensajeAsignacion" style="margin-top:10px; color:green; font-weight:bold;"></div>
+                <div id="mensajeAsignacion" style="margin-top:10px;font-weight:bold;"></div>
             </form>
         </div>
     </div>
 
-    <!-- =========================================================
-         MODAL AGREGAR USUARIO
-    ========================================================= -->
+    <!-- ========== MODAL AGREGAR USUARIO ========== -->
     <div id="modalAgregarUsuario" class="modal">
-        <div class="modal-content">
+        <div class="modal-contenido">
             <h2>Agregar Usuario</h2>
-            <form id="formAgregarUsuario" method="POST" action="../menu.php">
-                <div class="form-grid">
-                    <div class="full-width">
+            <form id="formAgregarUsuario" method="POST">
+                <div class="formulario-cuadricula">
+                    <div class="ancho-completo">
                         <label>Correo</label>
                         <input type="email" name="correo" placeholder="usuario@ejemplo.com" required>
                     </div>
-                    <div class="full-width">
+                    <div class="ancho-completo">
                         <label>Contraseña</label>
                         <input type="password" name="password" placeholder="Contraseña" required>
                     </div>
-                    <div class="full-width">
+                    <div class="ancho-completo">
                         <label>Rol</label>
-                        <div class="custom-select" id="rolSelect">
+                        <div class="selector-personalizado" id="selectorRol">
                             <input type="hidden" name="rol">
-                            <span class="select-selected">Seleccionar</span>
-                            <div class="select-items select-hide">
+                            <span class="opcion-seleccionada">Seleccionar</span>
+                            <div class="lista-opciones">
                                 <div>admin</div>
                                 <div>user</div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="form-buttons">
+                <div class="formulario-botones">
                     <button type="button" id="cancelarUsuario">Cancelar</button>
                     <button type="button" id="guardarUsuario">Agregar Usuario</button>
                 </div>
-                <div id="mensajeAgregarUsuario" style="margin-top:10px; font-weight:bold;"></div>
+                <div id="mensajeAgregarUsuario" style="margin-top:10px;font-weight:bold;"></div>
             </form>
         </div>
     </div>
 
-    <!-- =========================================================
-         MODAL VER USUARIOS
-    ========================================================= -->
+    <!-- ========== MODAL VER USUARIOS ========== -->
     <div id="modalVerUsuarios" class="modal">
-        <div class="modal-content">
+        <div class="modal-contenido">
             <h2>Ver Usuarios</h2>
-            <table id="tablaUsuarios" border="1" style="width:100%; text-align:left;">
+            <table id="tablaUsuarios">
                 <thead>
                     <tr>
                         <th>Usuario</th>
@@ -241,300 +252,31 @@
                         <th>Acción</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <!-- Aquí se cargarán los usuarios vía JS -->
-                </tbody>
+                <tbody></tbody>
             </table>
-            <div class="form-buttons">
+            <div class="formulario-botones">
                 <button type="button" id="cerrarVerUsuarios">Cerrar</button>
             </div>
         </div>
     </div>
 
-    <!-- =========================================================
-         SCRIPTS
-    ========================================================= -->
-    <script>
-        // ===================== CONFIG MENÚ DESPLEGABLE =====================
-        const configIcon = document.getElementById('configIcon');
-        const configMenu = document.getElementById('configMenu');
+    <!-- ========== MODAL CAMBIO DE ROL ========== -->
+    <div id="modalCambioRol" class="modal">
+        <div class="modal-contenido">
+            <h3>Confirmar Cambio de Rol</h3>
+            <input type="hidden" id="cambioRolUsername">
+            <input type="hidden" id="cambioRolNuevoRol">
+            <input type="password" id="passwordAdminInput" placeholder="Contraseña de administrador">
+            <div id="mensajeCambioRol" style="margin-bottom:10px;"></div>
+            <div class="formulario-botones">
+                <button type="button" id="cancelarCambioRol">Cancelar</button>
+                <button type="button" id="confirmarCambioRol">Confirmar</button>
+            </div>
+        </div>
+    </div>
 
-        function toggleConfigMenu() {
-            configMenu.style.display = (configMenu.style.display === 'block') ? 'none' : 'block';
-        }
-
-        configIcon.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            toggleConfigMenu();
-        });
-
-        document.addEventListener('click', (e) => {
-            if (!configMenu.contains(e.target) && e.target !== configIcon) {
-                configMenu.style.display = 'none';
-            }
-        });
-
-        // ===================== AUTOCOMPLETADO =====================
-        function autocompletar(input, tipo, contenedorID) {
-            const contenedor = document.getElementById(contenedorID);
-            input.addEventListener("input", function() {
-                const valor = this.value.trim();
-                contenedor.innerHTML = "";
-                if (!valor) return;
-
-                fetch(`../menu.php?tipo=${tipo}&q=${encodeURIComponent(valor)}`)
-                    .then(res => res.json())
-                    .then(data => {
-                        contenedor.innerHTML = "";
-                        data.forEach(item => {
-                            const div = document.createElement("div");
-                            div.textContent = item;
-                            div.addEventListener("click", function() {
-                                input.value = item;
-                                contenedor.innerHTML = "";
-                            });
-                            contenedor.appendChild(div);
-                        });
-                    })
-                    .catch(err => console.error(err));
-            });
-            document.addEventListener("click", function(e) {
-                if (e.target !== input) contenedor.innerHTML = "";
-            });
-        }
-
-        autocompletar(document.getElementById("usuario"), "usuario", "usuarioList");
-        autocompletar(document.getElementById("activo"), "activo", "activoList");
-
-        // ===================== MODALES =====================
-        const btnNuevoActivo = document.getElementById('btnNuevoActivo');
-        const modalNuevoActivo = document.getElementById('modalNuevoActivo');
-        const btnCancelar = document.getElementById('cancelar');
-        const serieContainer = document.getElementById('serieContainer');
-        const cantidadSelect = document.querySelector('#cantidadSelect');
-        const modalAsignarActivo = document.getElementById('modalAsignarActivo');
-        const btnAsignarActivo = document.getElementById('btnAsignarActivo');
-        const btnCancelarAsignacion = document.getElementById('cancelarAsignacion');
-        const modalAgregarUsuario = document.getElementById('modalAgregarUsuario');
-        const btnAgregarUsuario = document.getElementById('btnAgregarUsuario');
-        const btnCancelarUsuario = document.getElementById('cancelarUsuario');
-
-        btnNuevoActivo.addEventListener('click', (e) => {
-            e.preventDefault();
-            modalNuevoActivo.style.display = 'flex';
-        });
-        btnCancelar.addEventListener('click', () => {
-            modalNuevoActivo.style.display = 'none';
-        });
-        btnAsignarActivo.addEventListener('click', (e) => {
-            e.preventDefault();
-            modalAsignarActivo.style.display = 'flex';
-        });
-        btnCancelarAsignacion.addEventListener('click', () => {
-            modalAsignarActivo.style.display = 'none';
-        });
-
-        // Abrir modal Agregar Usuario
-        btnAgregarUsuario.addEventListener('click', (e) => {
-            e.preventDefault();
-            modalAgregarUsuario.style.display = 'flex';
-        });
-        btnCancelarUsuario.addEventListener('click', () => {
-            modalAgregarUsuario.style.display = 'none';
-        });
-
-        window.addEventListener('click', (e) => {
-            if(e.target === modalNuevoActivo) modalNuevoActivo.style.display = 'none';
-            if(e.target === modalAsignarActivo) modalAsignarActivo.style.display = 'none';
-            if(e.target === modalAgregarUsuario) modalAgregarUsuario.style.display = 'none';
-            if(e.target === modalVerUsuarios) modalVerUsuarios.style.display = 'none';
-        });
-
-        // ===================== CAMPOS DE SERIE =====================
-        function generarCamposSerie(cantidad){
-            serieContainer.innerHTML = "";
-            for(let i=1; i<=cantidad; i++){
-                const input = document.createElement('input');
-                input.type = "text";
-                input.name = "id_producto[]"; 
-                input.placeholder = `Número de Serie ${i}`;
-                input.style.marginTop = "5px";
-                serieContainer.appendChild(input);
-            }
-        }
-
-        cantidadSelect.querySelectorAll('.select-items div').forEach(function(option){
-            option.addEventListener('click', function(){
-                const cantidad = parseInt(this.textContent);
-                if(!isNaN(cantidad)){
-                    generarCamposSerie(cantidad);
-                }
-            });
-        });
-
-        // ===================== MENÚ DESPLEGABLE PERSONALIZADO =====================
-        document.querySelectorAll('.custom-select').forEach(select => {
-            const selected = select.querySelector('.select-selected');
-            const items = select.querySelector('.select-items');
-
-            // click sigue funcionando para seleccionar
-            items.querySelectorAll('div').forEach(option => {
-                option.addEventListener('click', function() {
-                    selected.textContent = this.textContent;
-                    select.querySelector('input[type="hidden"]').value = this.textContent;
-                    items.style.display = 'none'; // cerrar al seleccionar
-                });
-            });
-        });
-
-        // ===================== ASIGNAR ACTIVO AJAX =====================
-        const formAsignar = document.getElementById('formAsignarActivo');
-        const btnGuardarAsignacion = document.getElementById('guardarAsignacion');
-        const mensajeAsignacion = document.getElementById('mensajeAsignacion');
-
-        btnGuardarAsignacion.addEventListener('click', () => {
-            const formData = new FormData(formAsignar);
-
-            fetch('../menu.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(res => res.json())
-            .then(data => {
-                mensajeAsignacion.textContent = data.success ? "Asignación realizada con éxito" : data.message;
-                mensajeAsignacion.style.color = data.success ? 'green' : 'red';
-
-                if(data.success){
-                    formAsignar.reset();
-                    setTimeout(() => {
-                        modalAsignarActivo.style.display = 'none';
-                        mensajeAsignacion.textContent = '';
-                    }, 2000);
-                }
-            })
-            .catch(err => {
-                mensajeAsignacion.style.color = 'red';
-                mensajeAsignacion.textContent = "Error al asignar el activo";
-                console.error(err);
-            });
-        });
-
-        // ===================== AGREGAR USUARIO AJAX =====================
-        const formAgregar = document.getElementById('formAgregarUsuario');
-        const btnGuardarUsuario = document.getElementById('guardarUsuario');
-        const mensajeAgregarUsuario = document.getElementById('mensajeAgregarUsuario');
-
-        btnGuardarUsuario.addEventListener('click', (e) => {
-            e.preventDefault();
-
-            const formData = new FormData(formAgregar);
-
-            fetch('../menu.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(res => res.json())
-            .then(data => {
-                if(data.success){
-                    mensajeAgregarUsuario.style.color = 'green';
-                    mensajeAgregarUsuario.textContent = "Usuario agregado correctamente";
-                    formAgregar.reset();
-                    setTimeout(() => {
-                        modalAgregarUsuario.style.display = 'none';
-                        mensajeAgregarUsuario.textContent = '';
-                    }, 2000);
-                } else {
-                    mensajeAgregarUsuario.style.color = 'red';
-                    mensajeAgregarUsuario.textContent = data.message || "Error al agregar usuario";
-                }
-            })
-            .catch(err => {
-                mensajeAgregarUsuario.style.color = 'red';
-                mensajeAgregarUsuario.textContent = "Error al agregar usuario";
-                console.error(err);
-            });
-        });
-
-        // ===================== VER USUARIOS =====================
-        const modalVerUsuarios = document.getElementById('modalVerUsuarios');
-        const btnVerUsuarios = document.getElementById('btnVerUsuarios');
-        const btnCerrarVerUsuarios = document.getElementById('cerrarVerUsuarios');
-
-        btnVerUsuarios.addEventListener('click', (e) => {
-            e.preventDefault();
-            modalVerUsuarios.style.display = 'flex';
-            cargarUsuarios();
-        });
-        btnCerrarVerUsuarios.addEventListener('click', () => modalVerUsuarios.style.display = 'none');
-
-        function cargarUsuarios(){
-            fetch('../menu.php?tipo=verUsuarios')
-            .then(res => res.json())
-            .then(data => {
-                const tbody = document.querySelector('#tablaUsuarios tbody');
-                tbody.innerHTML = '';
-                data.forEach(user => {
-                    const tr = document.createElement('tr');
-
-                    const tdUsername = document.createElement('td');
-                    tdUsername.textContent = user.username;
-
-                    const tdRolActual = document.createElement('td');
-                    tdRolActual.textContent = user.rol;
-
-                    const tdCambioRol = document.createElement('td');
-                    const selectRol = document.createElement('select');
-                    ['admin','user'].forEach(r => {
-                        const opt = document.createElement('option');
-                        opt.value = r;
-                        opt.textContent = r;
-                        if(r === user.rol) opt.selected = true;
-                        selectRol.appendChild(opt);
-                    });
-                    tdCambioRol.appendChild(selectRol);
-
-                    const tdAccion = document.createElement('td');
-                    const btnConfirmar = document.createElement('button');
-                    btnConfirmar.textContent = 'Confirmar';
-                    btnConfirmar.addEventListener('click', () => {
-                        const nuevoRol = selectRol.value;
-                        const passwordAdmin = prompt("Ingrese contraseña de administrador para confirmar:");
-                        if(!passwordAdmin) return alert('Operación cancelada');
-
-                        const formData = new FormData();
-                        formData.append('username', user.username);
-                        formData.append('nuevoRol', nuevoRol);
-                        formData.append('passwordAdmin', passwordAdmin);
-
-                        fetch('../menu.php', {
-                            method: 'POST',
-                            body: formData
-                        })
-                        .then(res => res.json())
-                        .then(resp => {
-                            if(resp.success){
-                                alert('Rol actualizado correctamente');
-                                tdRolActual.textContent = nuevoRol;
-                            } else {
-                                alert('Acceso inválido');
-                                selectRol.value = tdRolActual.textContent;
-                            }
-                        })
-                        .catch(err => console.error(err));
-                    });
-                    tdAccion.appendChild(btnConfirmar);
-
-                    tr.appendChild(tdUsername);
-                    tr.appendChild(tdRolActual);
-                    tr.appendChild(tdCambioRol);
-                    tr.appendChild(tdAccion);
-
-                    tbody.appendChild(tr);
-                });
-            })
-            .catch(err => console.error(err));
-        }
-    </script>
+    <script src="../recursos/js/peticiones.js"></script>
+    <script src="../recursos/js/utilidades.js"></script>
+    <script src="../recursos/js/menu.js"></script>
 </body>
 </html>

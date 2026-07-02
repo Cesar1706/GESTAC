@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../configuracion/base_datos.php';
+require_once __DIR__ . '/../configuracion/session_check.php';
 header('Content-Type: application/json; charset=utf-8');
 
 $accion = $_POST['accion'] ?? $_GET['accion'] ?? '';
@@ -36,6 +37,24 @@ if ($accion === 'cambiar_contrasena') {
     exit;
 }
 
+// ===================== LOGOUT =====================
+if ($accion === 'logout') {
+    $_SESSION = [];
+    session_destroy();
+    echo json_encode(['exito' => true, 'mensaje' => 'Sesion cerrada']);
+    exit;
+}
+
+// ===================== VERIFICAR SESION =====================
+if ($accion === 'verificar') {
+    echo json_encode([
+        'exito' => estaAutenticado(),
+        'usuario' => $_SESSION['usuario'] ?? null,
+        'rol' => $_SESSION['rol'] ?? null
+    ]);
+    exit;
+}
+
 // ===================== LOGIN =====================
 $usuario     = trim($_POST['usuario'] ?? '');
 $contrasena  = trim($_POST['password'] ?? '');
@@ -52,6 +71,8 @@ try {
     $fila = $stmt->fetch();
 
     if ($fila && password_verify($contrasena, $fila['password'])) {
+        $_SESSION['usuario'] = $fila['username'];
+        $_SESSION['rol']     = $fila['rol'];
         echo json_encode(['exito' => true, 'rol' => $fila['rol']]);
     } else {
         echo json_encode(['exito' => false, 'mensaje' => '❌ Usuario o contraseña incorrectos']);

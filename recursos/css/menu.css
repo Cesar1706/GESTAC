@@ -184,6 +184,14 @@ body {
 }
 .tarjeta-modulo:hover .imagen-modulo { transform: scale(1.2) rotate(5deg); }
 .texto-modulo { font-size: 1.3em; }
+.tiene-submenu .texto-modulo::after {
+    content: '•••';
+    display: block;
+    margin: 2px auto 0;
+    font-size: 0.45em;
+    letter-spacing: 3px;
+    opacity: 0.6;
+}
 .tarjeta-modulo:hover {
     background: linear-gradient(135deg, var(--verde-claro-primario), var(--verde-boton-hover));
     box-shadow: 0 15px 35px var(--sombra-principal);
@@ -204,8 +212,9 @@ body {
     opacity: 0;
     transition: opacity 0.3s ease, transform 0.3s ease;
 }
-.submenu-izquierdo { right: 100%; margin-right: 10px; }
-.submenu-derecho   { left: 100%;  margin-left:  10px; }
+.submenu-izquierdo { right: 100%; }
+.submenu-derecho   { left: 100%; }
+.tiene-submenu.abierto .submenu,
 .tiene-submenu:hover .submenu { display: block; opacity: 1; pointer-events: auto; }
 .submenu a {
     display: block;
@@ -220,16 +229,39 @@ body {
 }
 .submenu a:hover { background: var(--verde-boton-hover); color: #fff; }
 
-/* ── Icono de configuración ── */
-.icono-config {
+/* ── Barra superior (config + salir) ── */
+.barra-superior {
     position: fixed;
     top: 20px;
     right: 20px;
-    font-size: 3em;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    z-index: 100;
+}
+.link-salir {
+    color: var(--verde-300);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.9em;
+    padding: 8px 14px;
+    border: 2px solid var(--verde-300);
+    border-radius: 8px;
+    transition: all 0.25s ease;
+    background: rgba(0,0,0,0.15);
+}
+.link-salir:hover {
+    background: var(--verde-boton-hover);
+    color: #fff;
+    border-color: var(--verde-boton-hover);
+}
+
+/* ── Icono de configuración ── */
+.icono-config {
+    font-size: 2.2em;
     color: var(--verde-boton);
     text-decoration: none;
     transition: all 0.3s ease;
-    z-index: 100;
 }
 .icono-config:hover { color: var(--verde-boton-hover); transform: scale(1.25) rotate(15deg); }
 

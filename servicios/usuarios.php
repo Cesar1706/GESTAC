@@ -1,5 +1,7 @@
 <?php
 require_once __DIR__ . '/../configuracion/base_datos.php';
+require_once __DIR__ . '/../configuracion/session_check.php';
+requerirAutenticacion();
 
 $accion = $_GET['accion'] ?? '';
 $metodo = $_SERVER['REQUEST_METHOD'];

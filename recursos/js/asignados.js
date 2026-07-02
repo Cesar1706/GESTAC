@@ -37,7 +37,7 @@ function aplicarFiltros() {
 async function cargarUsuarios() {
     const cuerpo = document.getElementById('assets-data');
     const infoPag = document.querySelector('.pagination-info');
-    cuerpo.innerHTML = '<tr><td colspan="6" class="celda-vacia">Cargando usuarios...</td></tr>';
+    cuerpo.innerHTML = '<tr class="fila-spinner"><td colspan="6"><span><span class="spinner"></span>Cargando usuarios...</span></td></tr>';
 
     try {
         const datos = await realizarPeticion(ENDPOINT_USR);

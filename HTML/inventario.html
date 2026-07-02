@@ -40,6 +40,7 @@
                             <input type="text" id="sn" name="sn" required>
                         </div>
                     </div>
+                    <div id="msgInventario" style="margin:8px 0;font-weight:700;text-align:center;min-height:24px;"></div>
                     <div class="formulario-botones">
                         <button type="submit" id="btnAgregar" class="btn-principal">Agregar al Inventario</button>
                     </div>
@@ -67,6 +68,12 @@
         </div>
     </div>
 
+    <script>
+    fetch('../servicios/autenticacion.php?accion=verificar')
+        .then(r => r.json())
+        .then(d => { if (!d.exito) window.location.href = 'login.html'; })
+        .catch(() => { window.location.href = 'login.html'; });
+    </script>
     <script src="../recursos/js/peticiones.js"></script>
     <script src="../recursos/js/inventario.js"></script>
 </body>

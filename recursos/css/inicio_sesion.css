@@ -94,10 +94,12 @@ h1 {
 }
 
 #GESTAC {
-    color: rgba(168, 168, 168, 0.678);
-    font-size: 40px;
-    font-weight: bold;
+    color: #a8d5a8;
+    font-size: 48px;
+    font-weight: 900;
     text-align: center;
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.6);
+    letter-spacing: 3px;
 }
 
 /* ── Etiquetas ── */

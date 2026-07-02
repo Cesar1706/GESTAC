@@ -104,7 +104,10 @@
     </div>
 
     <!-- ================= CONFIGURACIONES ================= -->
-    <a href="#" class="icono-config" id="configIcon" title="Configuraciones">⚙️</a>
+    <div class="barra-superior">
+        <a href="#" class="icono-config" id="configIcon" title="Configuraciones">⚙️</a>
+        <a href="#" class="link-salir" id="btnSalir">Cerrar Sesion</a>
+    </div>
     <div class="menu-config" id="configMenu">
         <div class="tiene-submenu">
             <span id="usuariosMenu">Usuarios ▸</span>
@@ -114,7 +117,7 @@
             </div>
         </div>
         <a id="btnLogs" href="#">Logs</a>
-        <a href="login.html">Cerrar Sesión</a>
+        <a href="login.html" id="linkCerrarSesion">Cerrar Sesion</a>
     </div>
 
     <div class="leyenda-usuario">Usuario: <span id="user-type">ADMIN</span></div>
@@ -138,6 +141,10 @@
                         </div>
                     </div>
                     <div>
+                        <label>Nombre del producto</label>
+                        <input type="text" name="nombre">
+                    </div>
+                    <div>
                         <label>Cantidad</label>
                         <div class="selector-personalizado" id="selectorCantidad">
                             <input type="hidden" name="cantidad">
@@ -147,23 +154,31 @@
                             </div>
                         </div>
                     </div>
+                    <div>
+                        <label>Marca</label>
+                        <input type="text" name="marca">
+                    </div>
                     <div id="serieContainer" class="ancho-completo"></div>
+                    <div>
+                        <label>Procesador</label>
+                        <input type="text" name="procesador">
+                    </div>
+                    <div>
+                        <label>Almacenamiento</label>
+                        <input type="text" name="almacenamiento">
+                    </div>
+                    <div>
+                        <label>RAM</label>
+                        <input type="text" name="ram">
+                    </div>
                     <div class="ancho-completo">
                         <label>Número de Lote</label>
                         <input type="text" name="lote" placeholder="Ej. LOTE-2025-01">
-                    </div>
-                    <div>
-                        <label>Nombre del producto</label>
-                        <input type="text" name="nombre">
                     </div>
                     <div class="ancho-completo">
                         <label>Descripción del activo</label>
                         <textarea name="descripcion"></textarea>
                     </div>
-                    <div><label>Marca</label><input type="text" name="marca"></div>
-                    <div><label>Procesador</label><input type="text" name="procesador"></div>
-                    <div><label>Almacenamiento</label><input type="text" name="almacenamiento"></div>
-                    <div><label>RAM</label><input type="text" name="ram"></div>
                 </div>
                 <div class="formulario-botones">
                     <button type="button" id="cancelar">Cancelar</button>
@@ -275,6 +290,27 @@
         </div>
     </div>
 
+    <script>
+    fetch('../servicios/autenticacion.php?accion=verificar')
+        .then(r => r.json())
+        .then(d => {
+            if (!d.exito) { window.location.href = 'login.html'; return; }
+            if (d.rol !== 'admin') { window.location.href = 'menu_user.html'; return; }
+            document.getElementById('user-type').textContent = d.usuario.toUpperCase();
+        })
+        .catch(() => { window.location.href = 'login.html'; });
+
+    function cerrarSesion(e) {
+        e.preventDefault();
+        fetch('../servicios/autenticacion.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'accion=logout'
+        }).then(() => { window.location.href = 'login.html'; });
+    }
+    document.getElementById('btnSalir')?.addEventListener('click', cerrarSesion);
+    document.getElementById('linkCerrarSesion')?.addEventListener('click', cerrarSesion);
+    </script>
     <script src="../recursos/js/peticiones.js"></script>
     <script src="../recursos/js/utilidades.js"></script>
     <script src="../recursos/js/menu.js"></script>

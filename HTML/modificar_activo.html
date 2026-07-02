@@ -51,7 +51,7 @@
                         </tr>
                     </thead>
                     <tbody id="assets-data">
-                        <tr><td colspan="7" style="text-align:center;padding:20px">Cargando activos...</td></tr>
+                        <tr class="fila-spinner"><td colspan="7"><span><span class="spinner"></span>Cargando activos...</span></td></tr>
                     </tbody>
                 </table>
             </div>
@@ -118,6 +118,12 @@
         </div>
     </div>
 
+    <script>
+    fetch('../servicios/autenticacion.php?accion=verificar')
+        .then(r => r.json())
+        .then(d => { if (!d.exito) window.location.href = 'login.html'; })
+        .catch(() => { window.location.href = 'login.html'; });
+    </script>
     <script src="../recursos/js/peticiones.js"></script>
     <script src="../recursos/js/activos.js"></script>
 </body>

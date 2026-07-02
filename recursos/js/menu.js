@@ -52,6 +52,27 @@ const inpActivo  = document.getElementById('activo');
 if (inpUsuario) autocompletar(inpUsuario, 'usuario', 'usuarioList');
 if (inpActivo)  autocompletar(inpActivo,  'activo',  'activoList');
 
+/* ===================== SUBMENUS POR CLICK ===================== */
+document.querySelectorAll('.tiene-submenu').forEach(card => {
+    card.addEventListener('click', function (e) {
+        if (e.target.closest('.submenu a')) return;
+        e.stopPropagation();
+        document.querySelectorAll('.tiene-submenu.abierto').forEach(c => {
+            if (c !== this) c.classList.remove('abierto');
+        });
+        this.classList.toggle('abierto');
+    });
+});
+document.addEventListener('click', () => {
+    document.querySelectorAll('.tiene-submenu.abierto').forEach(c => c.classList.remove('abierto'));
+});
+document.querySelectorAll('.submenu a').forEach(enlace => {
+    enlace.addEventListener('click', e => {
+        e.stopPropagation();
+        enlace.closest('.tiene-submenu')?.classList.remove('abierto');
+    });
+});
+
 /* ===================== SELECTOR PERSONALIZADO ===================== */
 document.querySelectorAll('.selector-personalizado').forEach(selector => {
     const opcion  = selector.querySelector('.opcion-seleccionada');

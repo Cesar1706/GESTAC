@@ -11,7 +11,7 @@ async function cargarActivos() {
     const cuerpo       = document.getElementById('assets-data');
     const filtroCat    = document.getElementById('tipoFilter');
 
-    cuerpo.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px">Cargando activos...</td></tr>';
+    cuerpo.innerHTML = '<tr class="fila-spinner"><td colspan="7"><span><span class="spinner"></span>Cargando activos...</span></td></tr>';
 
     try {
         const datos = await realizarPeticion(ENDPOINT_ACT);

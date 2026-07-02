@@ -35,7 +35,7 @@
                     <div>
                         <label for="selUsuario">Nombre de la persona</label>
                         <select id="selUsuario" required>
-                            <option value="" selected disabled>Cargando usuarios…</option>
+                            <option value="" selected disabled>Cargando usuarios...</option>
                         </select>
                     </div>
                     <div>
@@ -45,7 +45,7 @@
                     <div>
                         <label for="selSerie">Número de serie</label>
                         <select id="selSerie" required>
-                            <option value="" selected disabled>Cargando series…</option>
+                            <option value="" selected disabled>Cargando series...</option>
                         </select>
                     </div>
                     <div>
@@ -90,6 +90,12 @@
         </div>
     </div>
 
+    <script>
+    fetch('../servicios/autenticacion.php?accion=verificar')
+        .then(r => r.json())
+        .then(d => { if (!d.exito) window.location.href = 'login.html'; })
+        .catch(() => { window.location.href = 'login.html'; });
+    </script>
     <script src="../recursos/js/peticiones.js"></script>
     <script src="../recursos/js/prestamos.js"></script>
 </body>

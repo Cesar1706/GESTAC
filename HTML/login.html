@@ -40,6 +40,15 @@
     </div>
 
     <script>
+    fetch('../servicios/autenticacion.php?accion=verificar')
+        .then(r => r.json())
+        .then(d => {
+            if (d.exito) {
+                window.location.href = d.rol === 'admin' ? 'menu_admin.html' : 'menu_user.html';
+            }
+        })
+        .catch(() => {});
+
     document.getElementById('formularioLogin').addEventListener('submit', function (e) {
         e.preventDefault();
         const usuario    = document.getElementById('campoUsuario').value.trim();

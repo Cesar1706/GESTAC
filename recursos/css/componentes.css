@@ -249,6 +249,33 @@
 }
 .icono-busqueda { font-size: 18px; opacity: 0.65; }
 
+/* ── Spinner de carga ── */
+.spinner {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    border-top-color: #7CFC90;
+    border-radius: 50%;
+    animation: girar 0.7s linear infinite;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+@keyframes girar {
+    to { transform: rotate(360deg); }
+}
+.fila-spinner td {
+    text-align: center;
+    padding: 30px !important;
+}
+.fila-spinner td span {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1rem;
+    color: #dfefdf;
+}
+
 /* ── Mensajes de estado ── */
 .mensaje-exito { color: #2b5a2b; font-weight: 700; }
 .mensaje-error  { color: #9b2c2c; font-weight: 700; }

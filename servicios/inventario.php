@@ -1,5 +1,7 @@
 <?php
 require_once __DIR__ . '/../configuracion/base_datos.php';
+require_once __DIR__ . '/../configuracion/session_check.php';
+requerirAutenticacion();
 header('Content-Type: application/json; charset=utf-8');
 
 $metodo = $_SERVER['REQUEST_METHOD'];
